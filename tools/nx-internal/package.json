@@ -1,0 +1,14 @@
+{
+  "name": "@ebizbase/nx-internal",
+  "private": true,
+  "description": "Nx plugin for internal use @ebizbase/office project",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "dependencies": {
+    "@swc/helpers": "~0.5.11"
+  },
+  "devDependencies": {},
+  "executors": "./executors.json",
+  "generators": "./generators.json"
+}

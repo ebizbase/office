@@ -1,0 +1,15 @@
+start_time=$(date +%s)
+
+# Your existing commands
+echo "Running pre-commit hook..."
+
+echo "Running check targets with affected projects..."
+npx nx affected --base=origin/main -t lint
+npx nx affected --base=origin/main -t test
+
+echo "Formating all change files..."
+npx lint-staged --relative
+
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+echo "Pre-commit hook completed in ${elapsed_time}s"

@@ -1,0 +1,92 @@
+name: Testing
+
+on:
+  pull_request_target:
+    branches:
+      - main
+  merge_group:
+
+
+concurrency:
+  group: ${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  pull-requests: write
+
+jobs:
+
+  affected:
+    name: Get affected projects
+    runs-on: ubuntu-latest
+    outputs:
+      affected-projects: ${{ steps.affected.outputs.projects }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Setup project
+        uses: ./.github/actions/setup
+        with:
+          dependencies: true
+      - name: Add and fetch main branch from original repository
+        run: |
+          repo="${{github.event.pull_request.base.repo.clone_url}}"
+          if [ -z "$repo" ]; then
+            repo="https://github.com/${{github.event.repository.full_name}}.git"
+          fi
+          git remote add upstream "$repo"
+          git fetch upstream main
+      - name: Get projects should run unit test and e2e test
+        id: affected
+        run: |
+          projects=$(npx nx show projects --affected --base=upstream/main --json | jq -r '.[]')
+          echo "Affected projects"
+          echo "$projects"
+          echo "projects=$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s . | jq -c .)" >> $GITHUB_OUTPUT
+
+  affected-check:
+    name: Affected projects check
+    runs-on: ubuntu-latest
+    needs: affected
+    if: ${{ needs.affected.outputs.affected-projects != '[""]' }}
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.affected.outputs.affected-projects) }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Setup project
+        uses: ./.github/actions/setup
+        with:
+          dependencies: true
+          buildx: true
+      - name: Run nx check
+        run: npx nx run-many -p ${{ matrix.project }} -t lint test e2e --configuration ci
+      - uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: CI Check (${{ matrix.project }})
+          conclusion: ${{ job.status }}
+
+  aggregate:
+    name: Aggregate results
+    runs-on: ubuntu-latest
+    needs: affected-check
+    if: always()
+    steps:
+      - uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: CI Check
+          conclusion: ${{needs.affected-check.result == 'skipped' && 'success' || needs.affected-check.result}}
+
+
