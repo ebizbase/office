@@ -1,0 +1,78 @@
+
+services:
+
+  traefik:
+    image: "traefik:v3.0"
+    container_name: "traefik"
+    command:
+      - --log.level=DEBUG
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+    ports:
+      - 80:80
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.fbi.com`)
+      - traefik.http.routers.traefik.service=traefik@docker
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+  coverage:
+    image: nginx:stable-alpine
+    container_name: coverage
+    volumes:
+      - ../.coverage:/usr/share/nginx/html
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.coverage.rule=Host(`coverage.fbi.com`)
+      - traefik.http.routers.coverage.entrypoints=web
+      - traefik.http.services.coverage.loadbalancer.server.port=80
+
+  mongo:
+    image: ghcr.io/ebizbase/mongodev:latest
+    container_name: mongo
+    ports:
+      - 27017:27017
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mongo-admin.rule=Host(`mongo.fbi.com`)
+      - traefik.http.routers.mongo-admin.entrypoints=web
+      - traefik.http.services.mongo-admin.loadbalancer.server.port=8081
+
+  redis:
+    image: ghcr.io/ebizbase/redisdev:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.redis-admin.rule=Host(`redis.fbi.com`)
+      - traefik.http.routers.redis-admin.entrypoints=web
+      - traefik.http.services.redis-admin.loadbalancer.server.port=8081
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rabbitmq-admin.rule=Host(`rabbitmq.fbi.com`)
+      - traefik.http.routers.rabbitmq-admin.entrypoints=web
+      - traefik.http.services.rabbitmq-admin.loadbalancer.server.port=15672
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - 1025:1025
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailhog-admin.rule=Host(`mail.fbi.com`)
+      - traefik.http.routers.mailhog-admin.entrypoints=web
+      - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
+
+

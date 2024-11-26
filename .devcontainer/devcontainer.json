@@ -7,7 +7,8 @@
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
   "remoteUser": "vscode",
-  "postCreateCommand": "bun install",
+  "postStartCommand": "bun install && docker compose -f .devcontainer/infras.yaml pull && docker compose -f .devcontainer/infras.yaml up -d",
+  "appPort": 80,
   "customizations": {
     "vscode": {
       "settings": {
