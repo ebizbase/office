@@ -1,6 +1,18 @@
 name: Setup project
-description: Setup project with node pnpm docker-buildx
+description: Setup project with node docker-buildx
 inputs:
+  package-manager:
+    description: Package manager to use
+    required: false
+    default: yarn
+  package-manager-install-command:
+    description: Package manager install command
+    required: false
+    default: install
+  package-manager-install-args:
+    description: Package manager install arguments
+    required: false
+    default: --frozen-lockfile
   dependencies:
     description: Install dependencies
     required: false
@@ -15,23 +27,12 @@ runs:
       with:
         node-version: lts/*
         registry-url: https://registry.npmjs.org
-
-    - uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
-      if: ${{ inputs.dependencies == 'true' }}
-      with:
-        path: ~/.bun/install/cache
-        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
-        restore-keys: |
-          ${{ runner.os }}-bun-
-
-    - name: Setup Bun
-      if: ${{ inputs.dependencies == 'true' }}
-      uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5 # v2
+        cache: ${{ inputs.package-manager }}
 
     - name: Install npm dependencies
       if: ${{ inputs.dependencies == 'true' }}
       shell: bash
-      run: bun install --frozen-lockfile
+      run: ${{ inputs.package-manager }} ${{ inputs.package-manager-install-command }} ${{ inputs.package-manager-install-args }}
 
     - name: Install docker buildx
       if: ${{ inputs.buildx == 'true' }}
