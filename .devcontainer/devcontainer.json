@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/ebizbase/node-dind-devcontainer:1@sha256:e193bb2fa762cd33b0bb4c6860283b01c4ea15aa186f403fd3742184686d55da",
+  "image": "ghcr.io/ebizbase/node-dind-playwright-devcontainer:1",
   "runArgs": [
     "--name=ebizbase-office-devcontainer"
   ],
@@ -7,7 +7,7 @@
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
   "remoteUser": "vscode",
-  "postStartCommand": "bun install && docker compose -f .devcontainer/infras.yaml pull && docker compose -f .devcontainer/infras.yaml up -d",
+  "postStartCommand": "yarn install && docker compose -f .devcontainer/infras.yaml pull && docker compose -f .devcontainer/infras.yaml up -d",
   "appPort": 80,
   "customizations": {
     "vscode": {
