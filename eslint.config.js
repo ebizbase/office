@@ -1,6 +1,8 @@
 const nx = require('@nx/eslint-plugin');
+const markdown = require('eslint-plugin-markdown');
 
 module.exports = [
+  ...markdown.configs.recommended,
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
@@ -66,5 +68,9 @@ module.exports = [
       ],
     },
     languageOptions: { parser: require('jsonc-eslint-parser') },
+  },
+  {
+    files: ['**/*.md'],
+    processor: 'markdown/markdown',
   },
 ];

@@ -8,8 +8,8 @@ const { CODE_COVERAGE } = require('./rules');
 module.exports = {
   ...nxPreset,
   verbose: true,
-  collectCoverage: true,
   collectCoverageFrom: ['src/**/*.ts', '!src/**/index.ts', '!src/**/*.d.ts'],
+  logHeapUsage: true,
   coverageThreshold: {
     global: CODE_COVERAGE,
   },

@@ -1,0 +1,74 @@
+{
+  "name": "api-gateway",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/services/_api-gateway/src",
+  "projectType": "application",
+  "tags": [],
+  "metadata": {
+    "version": "0.0.0",
+    "namespace": "ebizbase/office-api"
+  },
+  "targets": {
+    "compile": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "sourceMap": true,
+        "extractLicenses": false,
+        "outputPath": "dist/apps/services/_api-gateway",
+        "main": "apps/services/_api-gateway/src/main.ts",
+        "tsConfig": "apps/services/_api-gateway/tsconfig.app.json",
+        "webpackConfig": "apps/services/_api-gateway/webpack.config.js",
+        "assets": []
+      },
+      "configurations": {
+        "development": {
+          "optimization": false,
+          "generatePackageJson": false
+        },
+        "production": {
+          "optimization": true,
+          "generatePackageJson": true
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["compile"],
+      "options": {
+        "buildTarget": "api-gateway:compile",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "api-gateway:compile:development"
+        },
+        "production": {
+          "buildTarget": "api-gateway:compile:production"
+        }
+      }
+    },
+    "build": {
+      "dependsOn": ["compile"],
+      "executor": "@ebizbase/nx-docker:build",
+      "options": {
+        "name": "ebizbase/api"
+      },
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "load": true,
+          "tags": ["edge"]
+        },
+        "production": {
+          "push": true,
+          "tags": ["{major}.{minor}.{patch}"]
+        }
+      }
+    }
+  }
+}

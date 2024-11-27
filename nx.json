@@ -17,22 +17,36 @@
   "plugins": [
     {
       "plugin": "@nx/jest/plugin",
-      "exclude": ["**/*-e2e"],
+      "exclude": [
+        "apps/services/_api-gateway-e2e/**/*",
+        "apps/services/iam-service-e2e/**/*",
+        "apps/services/mailer-service-e2e/**/*",
+        "apps/services/transactional-mailer-service-e2e/**/*",
+        "apps/services/language-service-e2e/**/*",
+        "apps/services/file-service-e2e/**/*"
+      ],
       "options": {
         "targetName": "test"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "include": ["**/*-e2e"],
-      "options": {
-        "targetName": "e2e"
       }
     },
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
+      }
+    },
+    {
+      "plugin": "@nx/playwright/plugin",
+      "options": {
+        "targetName": "e2e"
+      }
+    },
+    {
+      "plugin": "@nx/webpack/plugin",
+      "options": {
+        "buildTargetName": "webpack:build",
+        "serveTargetName": "webpack:serve",
+        "previewTargetName": "preview"
       }
     }
   ],
@@ -70,6 +84,25 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "@angular-devkit/build-angular:application": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "e2e": {
+      "dependsOn": ["^compile"]
+    },
+    "e2e-ci--**/*": {
+      "dependsOn": ["^compile"]
+    }
+  },
+  "generators": {
+    "@nx/angular:application": {
+      "e2eTestRunner": "playwright",
+      "linter": "eslint",
+      "style": "scss",
+      "unitTestRunner": "jest"
     }
   }
 }

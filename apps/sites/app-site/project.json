@@ -1,0 +1,68 @@
+{
+  "name": "app-site",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/sites/app-site/src",
+  "tags": [],
+  "targets": {
+    "compile": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/sites/app-site",
+        "index": "apps/sites/app-site/src/index.html",
+        "browser": "apps/sites/app-site/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/sites/app-site/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/sites/app-site/public"
+          }
+        ],
+        "styles": ["apps/sites/app-site/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "port": 4201
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "app-site:compile:production"
+        },
+        "development": {
+          "buildTarget": "app-site:compile:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    }
+  }
+}
