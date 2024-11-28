@@ -19,6 +19,18 @@
   },
   "packageRules": [
     {
+      "extends": [
+        "monorepo:angular"
+      ],
+      "groupName": "angular monorepo",
+      "matchUpdateTypes": [
+        "digest",
+        "patch",
+        "minor",
+        "major"
+      ]
+    },
+    {
       "groupName": "All patch dependencies",
       "matchPackageNames": ["*"],
       "matchUpdateTypes": ["patch"],
