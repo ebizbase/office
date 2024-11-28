@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/ebizbase/node-dind-playwright-devcontainer:1",
+  "image": "ghcr.io/ebizbase/node-dind-playwright-devcontainer:1@sha256:5fcfb3682c2b1b9ae5e54e9670fdba680de7654d47b4173e3a460ac2e6ab5939",
   "runArgs": [
     "--name=ebizbase-office-devcontainer"
   ],
