@@ -12,11 +12,11 @@ module.exports = [
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
+      indent: 'off',
       eqeqeq: 'error',
       curly: 'error',
       quotes: ['error', 'single'],
       semi: ['error', 'always'],
-      indent: ['error', 2],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
