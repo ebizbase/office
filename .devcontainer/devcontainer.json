@@ -7,7 +7,7 @@
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
   "remoteUser": "vscode",
-  "postStartCommand": "yarn install && docker compose -f .devcontainer/infras.yaml pull && docker compose -f .devcontainer/infras.yaml up -d",
+  "postStartCommand": "yarn install",
   "appPort": 80,
   "customizations": {
     "vscode": {
