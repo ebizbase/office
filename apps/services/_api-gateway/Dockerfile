@@ -1,4 +1,4 @@
-FROM node:20-alpine@sha256:b5b9467fe7b33aad47f1ec3f6e0646a658f85f05c18d4243024212a91f3b7554 AS build
+FROM node:22-alpine@sha256:b64ced2e7cd0a4816699fe308ce6e8a08ccba463c757c00c14cd372e3d2c763e AS build
 WORKDIR /app
 COPY dist/apps/api/package.json .
 COPY dist/apps/api/yarn.lock .
