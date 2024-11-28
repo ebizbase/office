@@ -56,6 +56,7 @@ jobs:
     needs: affected
     if: ${{ needs.affected.outputs.affected-projects != '[""]' }}
     strategy:
+      fail-fast: false
       matrix:
         project: ${{ fromJson(needs.affected.outputs.affected-projects) }}
     steps:
