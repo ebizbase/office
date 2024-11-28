@@ -1,9 +1,7 @@
-
 services:
-
   traefik:
-    image: "traefik:v3.0"
-    container_name: "traefik"
+    image: 'traefik:v3.0'
+    container_name: 'traefik'
     command:
       - --log.level=DEBUG
       - --api.insecure=true
@@ -13,7 +11,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.fbi.com`)
@@ -75,4 +73,19 @@ services:
       - traefik.http.routers.mailhog-admin.entrypoints=web
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
 
-
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - 9000:9000
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ACCESS_KEY: minio
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio-admin.rule=Host(`minio.fbi.com`)
+      - traefik.http.routers.minio-admin.entrypoints=web
+      - traefik.http.services.minio-admin.loadbalancer.server.port=9001
+      - traefik.http.routers.minio.rule=Host(`files.fbi.com`)
+      - traefik.http.routers.minio.entrypoints=web
+      - traefik.http.services.minio.loadbalancer.server.port=9000
