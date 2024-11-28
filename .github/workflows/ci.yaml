@@ -69,6 +69,7 @@ jobs:
         with:
           dependencies: true
           buildx: true
+          package-manager-install-args: --frozen-lockfile --foreground-scripts
       - name: Run nx check
         run: npx nx run-many -p ${{ matrix.project }} -t lint test e2e --configuration ci
       - uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
