@@ -37,7 +37,7 @@
     "express": "~4.20.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
-    "zone.js": "~0.14.3"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@action-validator/cli": "^0.6.0",
