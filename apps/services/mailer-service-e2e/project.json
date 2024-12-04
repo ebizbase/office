@@ -5,6 +5,7 @@
   "implicitDependencies": ["mailer-service"],
   "targets": {
     "e2e": {
+      "dependsOn": ["^build"],
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {

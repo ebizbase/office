@@ -70,13 +70,11 @@
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "configurations": {
         "development": {
-          "passWithNoTests": true,
-          "coverageReporters": ["text", "html"]
+          "passWithNoTests": true
         },
         "ci": {
           "ci": true,
-          "passWithNoTests": false,
-          "coverageReporters": ["text-summary", "json-summary"]
+          "passWithNoTests": false
         }
       }
     },
@@ -89,12 +87,6 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
-    },
-    "e2e": {
-      "dependsOn": ["^compile"]
-    },
-    "e2e-ci--**/*": {
-      "dependsOn": ["^compile"]
     }
   },
   "generators": {
