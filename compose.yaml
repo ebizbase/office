@@ -22,7 +22,7 @@ services:
     image: nginx:stable-alpine
     container_name: coverage
     volumes:
-      - ../.coverage:/usr/share/nginx/html
+      - ./coverage:/usr/share/nginx/html
     labels:
       - traefik.enable=true
       - traefik.http.routers.coverage.rule=Host(`coverage.fbi.com`)
@@ -52,7 +52,9 @@ services:
       - traefik.http.services.redis-admin.loadbalancer.server.port=8081
 
   rabbitmq:
-    image: rabbitmq:management-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
     container_name: rabbitmq
     ports:
       - 5672:5672

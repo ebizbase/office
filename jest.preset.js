@@ -9,6 +9,7 @@ module.exports = {
   ...nxPreset,
   verbose: true,
   collectCoverageFrom: ['src/**/*.ts', '!src/**/index.ts', '!src/**/*.d.ts'],
+  coverageReporters: ['text', 'json-summary', 'html'],
   logHeapUsage: true,
   coverageThreshold: {
     global: CODE_COVERAGE,
