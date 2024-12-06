@@ -1,4 +1,4 @@
-FROM rabbitmq:management-alpine
+FROM rabbitmq:management-alpine@sha256:f45240d0afa8e58c3e1d65abc241a308cb7cf0583373ab65ee52a6a4c442be42
 
 RUN apk add --no-cache curl && rm -rf /var/cache/apk/*
 
