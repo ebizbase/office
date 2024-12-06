@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: 'traefik:v3.0@sha256:a208c74fd80a566d4ea376053bff73d31616d7af3f1465a7747b8b89ee34d97e'
+    image: 'traefik:v3.2@sha256:1a3e33f976d10f45efd613aa64814867068bf51c782599a70ef370447686291b'
     container_name: 'traefik'
     command:
       - --log.level=DEBUG
