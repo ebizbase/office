@@ -98,7 +98,7 @@
     "@typescript-eslint/parser": "^8.16.0",
     "@typescript-eslint/types": "^8.16.0",
     "@typescript-eslint/utils": "^8.0.0",
-    "angular-eslint": "^18.3.0",
+    "angular-eslint": "^19.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-markdown": "^5.1.0",
