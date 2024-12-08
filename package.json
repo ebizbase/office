@@ -41,7 +41,7 @@
     "axios": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "eventsource": "^2.0.2",
+    "eventsource": "^3.0.0",
     "express": "~4.21.0",
     "mongoose": "^8.8.3",
     "nestjs-pino": "^4.1.0",
