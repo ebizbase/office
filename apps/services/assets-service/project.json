@@ -1,0 +1,36 @@
+{
+  "name": "assets-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/services/assets-service/files",
+  "projectType": "application",
+  "tags": [],
+  "metadata": {
+    "version": "0.0.0",
+    "namespace": "ebizbase/assets-service"
+  },
+  "targets": {
+    "serve": {
+      "executor": "@nx/web:file-server",
+      "dependsOn": ["compile"],
+      "options": {
+        "port": 3006,
+        "watch": false,
+        "staticFilePath": "apps/services/assets-service/files"
+      }
+    },
+    "build": {
+      "executor": "@ebizbase/nx-docker:build",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "load": true,
+          "tags": ["edge"]
+        },
+        "production": {
+          "push": true,
+          "tags": ["{major}.{minor}.{patch}"]
+        }
+      }
+    }
+  }
+}
