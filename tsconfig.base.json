@@ -29,7 +29,8 @@
     "baseUrl": ".",
     "paths": {
       "@ebizbase/mailer-common": ["libs/mailer-common/src/index.ts"],
-      "@ebizbase/nx-internal": ["tools/nx-internal/src/index.ts"]
+      "@ebizbase/nx-internal": ["tools/nx-internal/src/index.ts"],
+      "@ebizbase/testing-common": ["libs/testing-common/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
