@@ -28,6 +28,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@ebizbase/mailer-common": ["libs/mailer-common/src/index.ts"],
       "@ebizbase/nx-internal": ["tools/nx-internal/src/index.ts"]
     }
   },

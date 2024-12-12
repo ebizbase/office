@@ -1,6 +1,6 @@
+import { IMail } from '@ebizbase/mailer-common';
 import { TransporterService } from './../transporter/transporter.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { IMail } from './mail.interface';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 
 @Injectable()
