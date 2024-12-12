@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MailerService } from './mailer.service';
 import { TransporterService } from './../transporter/transporter.service';
 import { Logger } from '@nestjs/common';
-import { IMail } from './mail.interface';
+import { IMail } from '@ebizbase/mailer-common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 
 jest.mock('@golevelup/nestjs-rabbitmq', () => ({

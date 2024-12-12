@@ -1,7 +1,4 @@
-interface IEmailAddress {
-  name: string;
-  address: string;
-}
+import { IEmailAddress } from './email-address.interface';
 
 export interface IMail {
   from: string | IEmailAddress;
