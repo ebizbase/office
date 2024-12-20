@@ -93,7 +93,7 @@
     "@types/express": "5.0.0",
     "@types/is-ci": "^3.0.4",
     "@types/jest": "^29.5.12",
-    "@types/node": "22.10.1",
+    "@types/node": "22.10.2",
     "@types/nodemailer": "^6.4.17",
     "@typescript-eslint/parser": "^8.16.0",
     "@typescript-eslint/types": "^8.16.0",
