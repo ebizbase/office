@@ -76,7 +76,7 @@ services:
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
 
   minio:
-    image: quay.io/minio/minio@sha256:ac591851803a79aee64bc37f66d77c56b0a4b6e12d9e5356380f4105510f2332
+    image: quay.io/minio/minio@sha256:1dce27c494a16bae114774f1cec295493f3613142713130c2d22dd5696be6ad3
     container_name: minio
     ports:
       - 9000:9000
