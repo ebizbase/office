@@ -6,7 +6,7 @@ import {
   StartedTestContainer,
   Wait,
 } from 'testcontainers';
-import { StartedMailHogContainer } from '../mailhog';
+import { StartedMailHogContainer } from '../../infras/mailhog';
 
 export class MailerServiceContainer extends GenericContainer {
   constructor(
@@ -35,13 +35,5 @@ export class MailerServiceContainer extends GenericContainer {
 export class StartedMailerServiceContainer extends AbstractStartedContainer {
   constructor(container: StartedTestContainer) {
     super(container);
-  }
-
-  getSmtpUri(): string {
-    return 'smtp://' + this.getHost() + ':' + this.getMappedPort(1025);
-  }
-
-  getMailhogApiUrl(): string {
-    return `http://localhost:${this.getMappedPort(8025)}/api`;
   }
 }

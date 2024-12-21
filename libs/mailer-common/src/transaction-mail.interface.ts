@@ -1,5 +1,7 @@
 import { IEmailAddress } from './email-address.interface';
-export type TransactionalEvent = 'user.otp' | 'user.forgot-password' | 'user.reset-password';
+
+export type AccountTransactionEvent = 'account-otp';
+export type TransactionalEvent = AccountTransactionEvent;
 
 export interface ITransactionalMail {
   event: TransactionalEvent;

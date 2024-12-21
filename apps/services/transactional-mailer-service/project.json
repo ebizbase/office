@@ -6,7 +6,7 @@
   "tags": [],
   "metadata": {
     "version": "0.0.0",
-    "namespace": "ebizbase/office-api"
+    "namespace": "ebizbase/office-transactional-mailer-service"
   },
   "targets": {
     "compile": {
@@ -19,10 +19,10 @@
         "sourceMap": true,
         "extractLicenses": false,
         "outputPath": "dist/apps/services/transactional-mailer-service",
-        "main": "apps/services/transactional-mailer-service/src/main.ts",
+        "main": "apps/services/transactional-mailer-service/src/index.ts",
         "tsConfig": "apps/services/transactional-mailer-service/tsconfig.app.json",
         "webpackConfig": "apps/services/transactional-mailer-service/webpack.config.js",
-        "assets": []
+        "assets": ["apps/services/transactional-mailer-service/src/assets"]
       },
       "configurations": {
         "development": {
@@ -55,9 +55,6 @@
     "build": {
       "dependsOn": ["compile"],
       "executor": "@ebizbase/nx-docker:build",
-      "options": {
-        "name": "ebizbase/api"
-      },
       "defaultConfiguration": "development",
       "configurations": {
         "development": {

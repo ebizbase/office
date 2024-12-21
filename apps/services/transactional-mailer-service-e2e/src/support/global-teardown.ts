@@ -1,5 +1,2 @@
-import { teardown as teardownDevServer } from 'jest-dev-server';
-
-module.exports = async function () {
-  teardownDevServer(globalThis.servers);
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+module.exports = async function () {};

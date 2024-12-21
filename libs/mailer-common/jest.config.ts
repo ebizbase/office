@@ -7,4 +7,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/libs/mailer-common',
+  passWithNoTests: true,
+  collectCoverage: false,
 };
