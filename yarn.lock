@@ -9574,16 +9574,16 @@ jest-config@^29.4.1, jest-config@^29.7.0:
     slash "^3.0.0"
     strip-json-comments "^3.1.1"
 
-jest-dev-server@^10.1.4:
-  version "10.1.4"
-  resolved "https://registry.yarnpkg.com/jest-dev-server/-/jest-dev-server-10.1.4.tgz#59ade7c30c494fdfc20b2a788af8e02b105744a1"
-  integrity sha512-bGQ6sedNGtT6AFHhCVqGTXMPz7UyJi/ZrhNBgyqsP0XU9N8acCEIfqZEA22rOaZ+NdEVsaltk6tL7UT6aXfI7w==
+jest-dev-server@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/jest-dev-server/-/jest-dev-server-11.0.0.tgz#f85f1e2188c469efd1a2bf9bd61af05070baf21f"
+  integrity sha512-a54rw3uEzsPckyiXo2rPji9R/5z0d0qhXtru+NwCP8cDxOFk/BIP9PNgmcLh0DU8UTl8s6Lg1u+ri5uQsTJTmw==
   dependencies:
     chalk "^4.1.2"
     cwd "^0.10.0"
     find-process "^1.4.7"
     prompts "^2.4.2"
-    spawnd "^10.1.4"
+    spawnd "^11.0.0"
     tree-kill "^1.2.2"
     wait-on "^8.0.1"
 
@@ -13272,10 +13272,10 @@ sparse-bitfield@^3.0.3:
   dependencies:
     memory-pager "^1.0.2"
 
-spawnd@^10.1.4:
-  version "10.1.4"
-  resolved "https://registry.yarnpkg.com/spawnd/-/spawnd-10.1.4.tgz#a26be19756cc8a1796800499d0edececa409014d"
-  integrity sha512-drqHc0mKJmtMsiGMOCwzlc5eZ0RPtRvT7tQAluW2A0qUc0G7TQ8KLcn3E6K5qzkLkH2UkS3nYQiVGULvvsD9dw==
+spawnd@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/spawnd/-/spawnd-11.0.0.tgz#b16874b5813b26a37427abfa95e4ad722e030ba4"
+  integrity sha512-brBHv9HYi8lwNvbI7X52NDZe4yAdsQwvr81b/r98LaN82LzeEnQ0L6YXBvG25zhgWRadTwB+4GsUu9NrNQcVzw==
   dependencies:
     signal-exit "^4.1.0"
     tree-kill "^1.2.2"
