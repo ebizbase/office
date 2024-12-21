@@ -14,7 +14,7 @@ export class MailerService {
     routingKey: 'send_email',
     queue: 'send_email_queue',
   })
-  async sendMail(mail: IMail & { id?: string }): Promise<void> {
+  async sendMail(mail: IMail): Promise<void> {
     this.logger.debug({ msg: 'Sending email', mail });
     try {
       await this.transporter.sendMail({

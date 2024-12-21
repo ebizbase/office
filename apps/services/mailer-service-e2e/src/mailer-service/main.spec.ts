@@ -24,7 +24,7 @@ describe('Main spec', () => {
     rabbitmqContainer = infraContainers[1];
     mailhogContainer = infraContainers[2];
     mailerServiceContainers = [];
-  }, 30000);
+  }, 120000);
 
   beforeEach(async () => {
     for (const mailerServiceContainer of mailerServiceContainers) {

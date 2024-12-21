@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { RabbitMQConfig, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { LoggerModule } from 'nestjs-pino';
-import { MailerModule } from './mailer/mailer.module';
 import mongodbConfig from './config/mongodb.config';
 import rabbitmqConfig from './config/rabbitmq.config';
-import smtpConfig from './config/smtp.config';
-import { TransporterModule } from './transporter/transporter.module';
-import SMTPPool from 'nodemailer/lib/smtp-pool';
+import { TemplateModule } from './template/template.module';
+import { join } from 'path';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -36,23 +34,18 @@ import SMTPPool from 'nodemailer/lib/smtp-pool';
       isGlobal: true,
       cache: true,
       expandVariables: true,
-      load: [mongodbConfig, rabbitmqConfig, smtpConfig],
+      load: [mongodbConfig, rabbitmqConfig],
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (cfg: ConfigService) =>
         cfg.get<MongooseModuleOptions>('mongodb.configs', { infer: true }),
     }),
-    RabbitMQModule.forRootAsync(RabbitMQModule, {
-      inject: [ConfigService],
-      useFactory: async (cfg: ConfigService) =>
-        cfg.get<RabbitMQConfig>('rabbitmq.configs', { infer: true }),
-    }),
-    TransporterModule.registerAsync({
-      inject: [ConfigService],
-      isGlobal: true,
-      useFactory: async (cfg: ConfigService) =>
-        cfg.get<SMTPPool.Options>('smtp.configs', { infer: true }),
+    TemplateModule.registerAsync({
+      useFactory: () => ({
+        isGlobal: true,
+        assetPath: join(__dirname, 'assets'),
+      }),
     }),
     MailerModule,
   ],
