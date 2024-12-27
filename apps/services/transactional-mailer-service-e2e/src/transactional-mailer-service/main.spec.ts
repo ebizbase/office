@@ -3,21 +3,16 @@ import {
   MailHogContainer,
   StartedRabbitMQContainer,
   RabbitMQContainer,
-  StartedMailHogContainer,
   MailerServiceContainer,
-  StartedMailerServiceContainer,
-  StartedTransactionalMailerServiceContainer,
   TransactionalMailerServiceContainer,
+  StartedMailHogContainer,
 } from '@ebizbase/testing-common';
-import { MongoDBContainer, StartedMongoDBContainer } from '@testcontainers/mongodb';
+import { MongoDBContainer } from '@testcontainers/mongodb';
 import { v1 as uuidv1 } from 'uuid';
 
 describe('Main spec', () => {
-  let mongodbContainer: StartedMongoDBContainer;
   let rabbitmqContainer: StartedRabbitMQContainer;
   let mailhogContainer: StartedMailHogContainer;
-  let mailerServiceContainer: StartedMailerServiceContainer;
-  let transactionalMailerServiceContainer: StartedTransactionalMailerServiceContainer;
 
   beforeAll(async () => {
     const infraContainers = await Promise.all([
@@ -25,65 +20,29 @@ describe('Main spec', () => {
       new RabbitMQContainer().start(),
       new MailHogContainer().start(),
     ]);
-    mongodbContainer = infraContainers[0];
-    rabbitmqContainer = infraContainers[1];
-    mailhogContainer = infraContainers[2];
-
-    const services = await Promise.all([
+    await Promise.all([
       new MailerServiceContainer({
-        mongodb: mongodbContainer,
-        rabitmq: rabbitmqContainer,
-        mailhog: mailhogContainer,
-      })
-        .withLogConsumer((stream) => {
-          stream.on('data', (chunk) => {
-            process.stdout.write('[Mailer]' + chunk);
-          });
-          stream.on('error', (chunk) => {
-            process.stdout.write('[Mailer]' + chunk);
-          });
-        })
-        .start(),
+        mongodb: infraContainers[0],
+        rabitmq: infraContainers[1],
+        mailhog: infraContainers[2],
+      }).start(),
 
       new TransactionalMailerServiceContainer({
-        mongodb: mongodbContainer,
-        rabitmq: rabbitmqContainer,
-        mailhog: mailhogContainer,
-      })
-        .withLogConsumer((stream) => {
-          stream.on('data', (chunk) => {
-            process.stdout.write('[Transactional]' + chunk);
-          });
-          stream.on('error', (chunk) => {
-            process.stdout.write('[Transactional]' + chunk);
-          });
-        })
-        .start(),
+        mongodb: infraContainers[0],
+        rabitmq: infraContainers[1],
+        mailhog: infraContainers[2],
+      }).start(),
     ]);
-    mailerServiceContainer = services[0];
-    transactionalMailerServiceContainer = services[1];
-  }, 120000);
+    rabbitmqContainer = infraContainers[1];
+    mailhogContainer = infraContainers[2];
+  }, 120_000);
 
-  afterAll(async () => {
-    try {
-      await Promise.all([
-        mongodbContainer.stop(),
-        rabbitmqContainer.stop(),
-        mailhogContainer.stop(),
-        mailerServiceContainer.stop(),
-        transactionalMailerServiceContainer.stop(),
-      ]);
-    } catch {
-      // do notthing
-    }
-  }, 30000);
-
-  it('should send otp email success full', async () => {
+  it('should send account otp email from queue successfull when publish message to exchange', async () => {
     const otpEmail: ITransactionalMail = {
       event: 'account-otp',
       to: uuidv1() + '@example.com',
       data: {
-        otp: '123456',
+        otp: uuidv1() + '-otp',
       },
     };
 
@@ -95,5 +54,6 @@ describe('Main spec', () => {
     const receivedMails = await mailhogContainer.waitForEmail(otpEmail.to as string);
     expect(receivedMails).toHaveLength(1);
     expect(receivedMails[0].Content.Headers['Subject'][0]).toBe('[nBiz] Your OTP for your account');
+    expect(receivedMails[0].Content.Body).toContain(otpEmail.data['otp']);
   }, 10000);
 });
