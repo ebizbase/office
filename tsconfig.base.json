@@ -28,9 +28,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ebizbase/mailer-common": ["libs/mailer-common/src/index.ts"],
+      "@ebizbase/common-types": ["libs/common/common-types/src/index.ts"],
+      "@ebizbase/mail-interfaces": ["libs/common/mail-interfaces/src/index.ts"],
+      "@ebizbase/nestjs-mongo": ["libs/nestjs/nestjs-mongo/src/index.ts"],
+      "@ebizbase/nestjs-node-mailer": ["libs/nestjs/nestjs-node-mailer/src/index.ts"],
+      "@ebizbase/nestjs-pino-logger": ["libs/nestjs/nestjs-pino-logger/src/index.ts"],
+      "@ebizbase/nestjs-rabbit": ["libs/nestjs/nestjs-rabbit/src/index.ts"],
       "@ebizbase/nx-internal": ["tools/nx-internal/src/index.ts"],
-      "@ebizbase/testing-common": ["libs/testing-common/src/index.ts"]
+      "@ebizbase/testcontainers": ["libs/common/testcontainers/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

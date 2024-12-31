@@ -17,17 +17,18 @@
   "plugins": [
     {
       "plugin": "@nx/jest/plugin",
-      "exclude": [
-        "apps/services/_api-gateway-e2e/**/*",
-        "apps/services/iam-service-e2e/**/*",
-        "apps/services/mailer-service-e2e/**/*",
-        "apps/services/transactional-mailer-service-e2e/**/*",
-        "apps/services/language-service-e2e/**/*",
-        "apps/services/file-service-e2e/**/*"
-      ],
+      "exclude": ["e2e/**/*", "apps/iam-service-e2e/**/*"],
       "options": {
         "targetName": "test"
       }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "include": ["e2e/**/*"],
+      "options": {
+        "targetName": "test"
+      },
+      "exclude": ["apps/iam-service-e2e/**/*"]
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -65,18 +66,15 @@
         "{workspaceRoot}/eslint.config.js"
       ]
     },
-    "@nx/jest:jest": {
+    "test": {
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "configurations": {
-        "development": {
-          "passWithNoTests": true
-        },
-        "ci": {
-          "ci": true,
-          "passWithNoTests": false
-        }
-      }
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js",
+        "{workspaceRoot}/playwright.config.js"
+      ],
+      "dependsOn": ["^build"]
     },
     "@nx/js:swc": {
       "cache": true,
