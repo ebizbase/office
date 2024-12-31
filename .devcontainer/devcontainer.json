@@ -7,7 +7,7 @@
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
   "remoteUser": "vscode",
-  "postStartCommand": "yarn install",
+  "postStartCommand": "npm i -g nx && yarn install",
   "appPort": 80,
   "customizations": {
     "vscode": {

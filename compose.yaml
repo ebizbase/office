@@ -82,7 +82,7 @@ services:
       - traefik.http.routers.mailhog-admin.entrypoints=web
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
     healthcheck:
-      test: ['CMD', 'wget', '-q', 'http://localhost:8025']
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:8025']
       interval: 5s
       timeout: 5s
       start_period: 5s
@@ -133,6 +133,34 @@ services:
       - LOG_DEBUG=*
       - LOG_TRACE=*
       - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
+      - RABBITMQ_URIS=amqp://rabbitmq:5672
+      - SMTP_URI=smtp://mailhog:1025
+
+  iam-service:
+    build:
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: iam-service
+    container_name: iam-service
+    expose:
+      - 3000
+    volumes:
+      - .:/workspace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
+    environment:
+      - LOG_DEBUG=*
+      - LOG_TRACE=*
+      - PORT=3000
+      - TOKEN_SECRET=secret
+      - ACCESS_TOKEN_EXPIRES=1s
+      - REFRESH_TOKEN_EXPIRES=10s
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
       - SMTP_URI=smtp://mailhog:1025

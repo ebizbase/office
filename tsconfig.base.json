@@ -29,6 +29,7 @@
     "baseUrl": ".",
     "paths": {
       "@ebizbase/common-types": ["libs/common/common-types/src/index.ts"],
+      "@ebizbase/iam-interfaces": ["libs/common/iam-interfaces/src/index.ts"],
       "@ebizbase/mail-interfaces": ["libs/common/mail-interfaces/src/index.ts"],
       "@ebizbase/nestjs-mongo": ["libs/nestjs/nestjs-mongo/src/index.ts"],
       "@ebizbase/nestjs-node-mailer": ["libs/nestjs/nestjs-node-mailer/src/index.ts"],

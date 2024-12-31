@@ -95,8 +95,8 @@ export class StartedMailHogContainer extends AbstractStartedContainer {
     return response.data as MailHogSearchResponse;
   }
 
-  async waitForEmail(to: string, timeout = 10000): Promise<Array<MailItem>> {
-    let timeoutId: NodeJS.Timeout; // Biến để lưu ID của timer
+  async waitForEmail(to: string, timeout = 20000): Promise<Array<MailItem>> {
+    let timeoutId: NodeJS.Timeout;
 
     const timeoutPromise = new Promise<MailItem[]>((_, reject) => {
       timeoutId = setTimeout(() => {

@@ -1,0 +1,9 @@
+{
+  "name": "iam-interfaces",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/common/iam-interfaces/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project iam-interfaces --web",
+  "targets": {}
+}
