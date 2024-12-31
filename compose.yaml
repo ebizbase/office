@@ -18,27 +18,22 @@ services:
       - traefik.http.routers.traefik.service=traefik@docker
       - traefik.http.services.traefik.loadbalancer.server.port=8080
 
-  coverage:
-    image: nginx:stable-alpine@sha256:35e3238f2f0925a505d5d697df9a9148db9a0c78e89fd2e253919047b3cec824
-    container_name: coverage
-    volumes:
-      - ./coverage:/usr/share/nginx/html
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.coverage.rule=Host(`coverage.fbi.com`)
-      - traefik.http.routers.coverage.entrypoints=web
-      - traefik.http.services.coverage.loadbalancer.server.port=80
-
-  mongo:
+  mongodb:
     image: ghcr.io/ebizbase/mongodev:latest@sha256:067acd2559e8804320590478ec2b1b108acdd5f8c37e14fc17ff7e35b6cb2abc
-    container_name: mongo
+    container_name: mongodb
     ports:
       - 27017:27017
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mongo-admin.rule=Host(`mongo.fbi.com`)
-      - traefik.http.routers.mongo-admin.entrypoints=web
-      - traefik.http.services.mongo-admin.loadbalancer.server.port=8081
+      - traefik.http.routers.mongodb-admin.rule=Host(`mongodb.fbi.com`)
+      - traefik.http.routers.mongodb-admin.entrypoints=web
+      - traefik.http.services.mongodb-admin.loadbalancer.server.port=8081
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
 
   redis:
     image: ghcr.io/ebizbase/redisdev:latest@sha256:71c75f02ae1d4e23d620ac2feae1e51b99945aba68077744956bb77a70166503
@@ -50,6 +45,12 @@ services:
       - traefik.http.routers.redis-admin.rule=Host(`redis.fbi.com`)
       - traefik.http.routers.redis-admin.entrypoints=web
       - traefik.http.services.redis-admin.loadbalancer.server.port=8081
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 5s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
 
   rabbitmq:
     build:
@@ -63,6 +64,12 @@ services:
       - traefik.http.routers.rabbitmq-admin.rule=Host(`rabbitmq.fbi.com`)
       - traefik.http.routers.rabbitmq-admin.entrypoints=web
       - traefik.http.services.rabbitmq-admin.loadbalancer.server.port=15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
 
   mailhog:
     image: mailhog/mailhog@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
@@ -74,6 +81,12 @@ services:
       - traefik.http.routers.mailhog-admin.rule=Host(`mail.fbi.com`)
       - traefik.http.routers.mailhog-admin.entrypoints=web
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
+    healthcheck:
+      test: ['CMD', 'wget', '-q', 'http://localhost:8025']
+      interval: 5s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
 
   minio:
     image: quay.io/minio/minio@sha256:1dce27c494a16bae114774f1cec295493f3613142713130c2d22dd5696be6ad3
@@ -92,3 +105,59 @@ services:
       - traefik.http.routers.minio.rule=Host(`files.fbi.com`)
       - traefik.http.routers.minio.entrypoints=web
       - traefik.http.services.minio.loadbalancer.server.port=9000
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 5s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
+
+  mailer-service:
+    build:
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: mailer-service
+    container_name: mailer-service
+    expose:
+      - 3000
+    volumes:
+      - .:/workspace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
+    environment:
+      - LOG_DEBUG=*
+      - LOG_TRACE=*
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
+      - RABBITMQ_URIS=amqp://rabbitmq:5672
+      - SMTP_URI=smtp://mailhog:1025
+
+  transactional-mailer-service:
+    build:
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE: transactional-mailer-service
+    container_name: transactional-mailer-service
+    expose:
+      - 3000
+    volumes:
+      - .:/workspace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
+    environment:
+      - LOG_DEBUG=*
+      - LOG_TRACE=*
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
+      - RABBITMQ_URIS=amqp://rabbitmq:5672
+      - SMTP_URI=smtp://mailhog:1025
