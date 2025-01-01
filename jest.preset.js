@@ -11,6 +11,7 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.ts', '!src/**/index.ts', '!src/**/*.d.ts'],
   coverageReporters: ['text', 'json-summary', 'html'],
   logHeapUsage: true,
+  passWithNoTests: true,
   coverageThreshold: {
     global: CODE_COVERAGE,
   },

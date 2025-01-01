@@ -1,9 +1,0 @@
-{
-  "name": "testcontainers",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/common/testcontainers/src",
-  "projectType": "library",
-  "tags": [],
-  "// targets": "to see all targets run: nx show project testcontainers --web",
-  "targets": {}
-}

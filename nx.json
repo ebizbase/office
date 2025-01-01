@@ -16,38 +16,29 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/jest/plugin",
-      "exclude": ["e2e/**/*", "apps/iam-service-e2e/**/*"],
-      "options": {
-        "targetName": "test"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "include": ["e2e/**/*"],
-      "options": {
-        "targetName": "test"
-      },
-      "exclude": ["apps/iam-service-e2e/**/*"]
-    },
-    {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
       }
     },
     {
-      "plugin": "@nx/playwright/plugin",
+      "plugin": "@nx/jest/plugin",
+      "exclude": ["**/*-e2e"],
       "options": {
-        "targetName": "e2e"
+        "targetName": "test"
       }
     },
     {
-      "plugin": "@nx/webpack/plugin",
+      "plugin": "@nx/jest/plugin",
+      "include": ["**/*-e2e"],
       "options": {
-        "buildTargetName": "webpack:build",
-        "serveTargetName": "webpack:serve",
-        "previewTargetName": "preview"
+        "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/playwright/plugin",
+      "options": {
+        "targetName": "e2e"
       }
     }
   ],
@@ -73,8 +64,7 @@
         "^production",
         "{workspaceRoot}/jest.preset.js",
         "{workspaceRoot}/playwright.config.js"
-      ],
-      "dependsOn": ["^build"]
+      ]
     },
     "@nx/js:swc": {
       "cache": true,
