@@ -1,7 +1,7 @@
-FROM node:22-alpine@sha256:6e80991f69cc7722c561e5d14d5e72ab47c0d6b6cfb3ae50fb9cf9a7b30fdf97 AS build
+FROM node:22-alpine@sha256:96cc8323e25c8cc6ddcb8b965e135cfd57846e8003ec0d7bcec16c5fd5f6d39f AS build
 WORKDIR /app
-COPY dist/apps/mailer-service/package.json .
-COPY dist/apps/mailer-service/yarn.lock .
+COPY dist/apps/transactional-mailer-service/package.json .
+COPY dist/apps/transactional-mailer-service/yarn.lock .
 RUN yarn install --frozen-lockfile
 
 
@@ -11,5 +11,5 @@ ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 COPY --from=build /app/node_modules ./node_modules
-COPY dist/apps/mailer-service .
+COPY dist/apps/transactional-mailer-service .
 CMD [ "main.js" ]

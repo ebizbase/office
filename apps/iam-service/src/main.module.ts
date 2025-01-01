@@ -2,7 +2,6 @@ import { NodeMailerModule } from '@ebizbase/nestjs-node-mailer';
 import { RabbitModule } from '@ebizbase/nestjs-rabbit';
 import { MongoModule } from '@ebizbase/nestjs-mongo';
 import { Module } from '@nestjs/common';
-import { MailerModule } from './mailer/mailer.module';
 import { HealthyModule } from './healthy/healthy.module';
 import { UserModule } from './user/user.module';
 import { AuthenticateModule } from './authenticate/authenticate.module';
@@ -24,8 +23,16 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     MongoModule.register('iam-service'),
     NodeMailerModule.register(),
-    RabbitModule.register({}),
-    MailerModule,
+    RabbitModule.register({
+      exchanges: [
+        {
+          name: 'transactional_mail_exchange',
+          type: 'direct',
+          createExchangeIfNotExists: true,
+          options: { durable: true },
+        },
+      ],
+    }),
     HealthyModule,
     UserModule,
     AuthenticateModule,

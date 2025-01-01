@@ -3,14 +3,13 @@ import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
-
-import { PinoLoggerService } from '../pino-logger';
+import { PinoLogger } from '../pino-logger';
 
 import { HttpLoggerOptions } from './http-logger.options';
 
 @Injectable()
 export class HttpLoggerInterceptor implements NestInterceptor {
-  private logger = new PinoLoggerService(HttpLoggerInterceptor.name);
+  private logger = new PinoLogger(HttpLoggerInterceptor.name);
 
   constructor(@Inject('HTTP_LOGGER_OPTIONS') private readonly options: HttpLoggerOptions) {}
 

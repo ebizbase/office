@@ -6,7 +6,7 @@
   "tags": ["services"],
   "metadata": {
     "version": "0.0.0",
-    "namespace": "ebizbase/office-mailer-service"
+    "namespace": "ebizbase/office-transactional-mailer-service"
   },
   "targets": {
     "compile": {
@@ -22,7 +22,7 @@
         "main": "apps/mailer-service/src/index.ts",
         "tsConfig": "apps/mailer-service/tsconfig.app.json",
         "webpackConfig": "apps/mailer-service/webpack.config.js",
-        "assets": []
+        "assets": ["apps/mailer-service/src/assets"]
       },
       "configurations": {
         "development": {

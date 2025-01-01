@@ -130,47 +130,16 @@ services:
       mailhog:
         condition: service_healthy
     environment:
-      - LOG_DEBUG=*
-      - LOG_TRACE=*
       - PORT=3000
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
       - SMTP_URI=smtp://mailhog:1025
+      - TRANSACTIONAL_EMAIL_SENDER=Ebizbase<noreply@ebizbase.com>
     labels:
       - traefik.enable=true
       - traefik.http.routers.mailer-service.rule=Host(`mailer-service.fbi.com`)
       - traefik.http.routers.mailer-service.entrypoints=web
       - traefik.http.services.mailer-service.loadbalancer.server.port=3000
-
-  transactional-mailer-service:
-    build:
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE: transactional-mailer-service
-    container_name: transactional-mailer-service
-    expose:
-      - 3000
-    volumes:
-      - .:/workspace
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      mailhog:
-        condition: service_healthy
-    environment:
-      - LOG_DEBUG=*
-      - LOG_TRACE=*
-      - PORT=3000
-      - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
-      - RABBITMQ_URIS=amqp://rabbitmq:5672
-      - SMTP_URI=smtp://mailhog:1025
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.transactional-mailer-service.rule=Host(`transactional-mailer-service.fbi.com`)
-      - traefik.http.routers.transactional-mailer-service.entrypoints=web
-      - traefik.http.services.transactional-mailer-service.loadbalancer.server.port=3000
 
   iam-service:
     build:
@@ -190,8 +159,6 @@ services:
       mailhog:
         condition: service_healthy
     environment:
-      - LOG_DEBUG=*
-      - LOG_TRACE=*
       - PORT=3000
       - TOKEN_SECRET=secret
       - ACCESS_TOKEN_EXPIRES=1s

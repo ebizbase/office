@@ -16,6 +16,6 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/mailer-service-e2e',
+  coverageDirectory: '../../coverage/transactional-mailer-service',
   maxWorkers: 1,
 } as Config.InitialOptions;

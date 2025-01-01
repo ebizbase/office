@@ -1,7 +1,6 @@
+import { ITransactionalMail } from '@ebizbase/mail-interfaces';
 import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { ITransactionalMail } from '@ebizbase/mail-interfaces';
 import { ICredential, ILoginResponse, IOnBoardRequest } from '@ebizbase/iam-interfaces';
 import { JwtService } from '@nestjs/jwt';
 import ms from 'ms';
@@ -10,6 +9,7 @@ import { IRefreshTokenPayload } from './refresh-token-payload.interface copy';
 import { Dict } from '@ebizbase/common-types';
 import { User } from '../user/user.schema';
 import speakeasy from 'speakeasy';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 
 @Injectable()
 export class AuthenticateService {
@@ -35,14 +35,15 @@ export class AuthenticateService {
     }
 
     const otp = this.generateHOTP(user);
+    console.log('OTP:', otp);
     const transactionalMail: ITransactionalMail = {
       event: 'account-otp',
       to: user.email,
       data: { otp },
     };
     await this.amqpConnection.publish(
-      'transactional_mailer_exchange',
-      'send_transactional_email',
+      'transactional_mail_exchange',
+      'send',
       Buffer.from(JSON.stringify(transactionalMail))
     );
   }

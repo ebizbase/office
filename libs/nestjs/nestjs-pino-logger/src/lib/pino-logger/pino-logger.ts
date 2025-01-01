@@ -1,21 +1,31 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { Level } from 'pino';
-
-import { Context } from './context';
-import { Config } from './config';
-import { isNamespaceEnabled } from './ultis';
+import pino, { Level, Logger } from 'pino';
 
 @Injectable()
-export class PinoLoggerService implements LoggerService {
-  public logger = Config.getLogger();
-  private parrentContext: Context;
+export class PinoLogger implements LoggerService {
+  public logger: Logger;
 
-  constructor(context?: string) {
-    this.parrentContext = new Context(context);
+  constructor(private context?: string) {
+    this.logger = pino({ level: 'trace' }, this.getStream());
   }
 
-  child(childContext: string): PinoLoggerService {
-    return new PinoLoggerService(this.parrentContext.merge(childContext).context);
+  private getStream() {
+    return this.getFormat() === 'text'
+      ? require('pino-pretty')({
+          sync: true,
+          colorize: true,
+          ignore: 'pid,hostname,context',
+          messageFormat: '[{pid}] [{context}] {msg}',
+        })
+      : undefined;
+  }
+
+  private getFormat() {
+    const format = process.env['LOG_FORMAT'] || 'json';
+    if (format !== 'json' && format !== 'text') {
+      throw new Error(`Invalid log format: ${format}. Use 'json' or 'text'`);
+    }
+    return format as 'json' | 'text';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +38,7 @@ export class PinoLoggerService implements LoggerService {
     if (this.isWrongExceptionsHandlerContract(level, message, optionalParams)) {
       objArg['err'] = new Error(message);
       objArg['err'].stack = params[0];
-      objArg['context'] = this.parrentContext.context;
+      objArg['context'] = this.context;
       this.logger[level](objArg);
       return;
     }
@@ -39,18 +49,10 @@ export class PinoLoggerService implements LoggerService {
       optionalParams.length !== 0 &&
       typeof optionalParams[optionalParams.length - 1] === 'string'
     ) {
-      objArg['context'] = this.parrentContext.merge(
-        optionalParams[optionalParams.length - 1]
-      ).context;
+      objArg['context'] = optionalParams[optionalParams.length - 1];
       params = optionalParams.slice(0, -1);
     } else {
-      objArg['context'] = this.parrentContext.context;
-    }
-
-    if (level === 'debug' && !this.shouldDebug(objArg['context'])) {
-      return;
-    } else if (level === 'trace' && !this.shouldTrace(objArg['context'])) {
-      return;
+      objArg['context'] = this.context;
     }
 
     if (typeof message === 'object') {
@@ -63,22 +65,6 @@ export class PinoLoggerService implements LoggerService {
     } else {
       this.logger[level](objArg, message, ...params);
     }
-  }
-
-  shouldDebug(context: string): boolean {
-    const debugConfig = Config.getDebugContextConfig();
-    if (!debugConfig) {
-      return false;
-    }
-    return isNamespaceEnabled(debugConfig, context);
-  }
-
-  shouldTrace(context: string): boolean {
-    const traceConfig = Config.getTraceContextConfig();
-    if (!traceConfig) {
-      return false;
-    }
-    return isNamespaceEnabled(traceConfig, context);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
