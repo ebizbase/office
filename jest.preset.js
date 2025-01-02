@@ -12,6 +12,7 @@ module.exports = {
   coverageReporters: ['text', 'json-summary', 'html'],
   logHeapUsage: true,
   passWithNoTests: true,
+  ci: process.env['CI'],
   coverageThreshold: {
     global: CODE_COVERAGE,
   },

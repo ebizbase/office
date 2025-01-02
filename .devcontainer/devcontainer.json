@@ -7,7 +7,8 @@
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
   "remoteUser": "vscode",
-  "postStartCommand": "npm i -g nx && yarn install",
+  "postCreateCommand": "npm i -g nx && sudo chown -R vscode:vscode ./*",
+  "postStartCommand": "yarn install && docker compose pull && docker compose build && docker compose up -d --wait | docker compose logs home-site",
   "appPort": 80,
   "customizations": {
     "vscode": {

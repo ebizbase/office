@@ -1,15 +1,13 @@
-name: Testing
+name: CI/CD
 
 on:
   pull_request_target:
     branches:
       - main
   merge_group:
-
-
-# concurrency:
-#   group: ${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.sha }}
-#   cancel-in-progress: true
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -19,72 +17,90 @@ permissions:
 
 jobs:
 
-  affected:
-    name: Get affected projects
+  intergration:
+    name: Intergration
     runs-on: ubuntu-latest
-    outputs:
-      affected-projects: ${{ steps.affected.outputs.projects }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Setup project
         uses: ./.github/actions/setup
         with:
           dependencies: true
-      - name: Add and fetch main branch from original repository
-        run: |
-          repo="${{github.event.pull_request.base.repo.clone_url}}"
-          if [ -z "$repo" ]; then
-            repo="https://github.com/${{github.event.repository.full_name}}.git"
-          fi
-          git remote add upstream "$repo"
-          git fetch upstream main
-      - name: Get projects should run unit test and e2e test
-        id: affected
-        run: |
-          projects=$(npx nx show projects --affected --base=upstream/main --json | jq -r '.[]')
-          echo "Affected projects"
-          echo "$projects"
-          echo "projects=$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s . | jq -c .)" >> $GITHUB_OUTPUT
-
-  affected-check:
-    name: Affected projects check
-    runs-on: ubuntu-latest
-    needs: affected
-    if: ${{ needs.affected.outputs.affected-projects != '[""]' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        project: ${{ fromJson(needs.affected.outputs.affected-projects) }}
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-      - name: Pre-build image and run make ci-build in dev container
+      - name: Run linting & testing
         uses: devcontainers/ci@a56d055efecd725e8cfe370543b6071b79989cc8 # v0.3
         with:
-          runCmd: npx nx run-many -p ${{ matrix.project }} -t lint test e2e --configuration ci
-      - uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: CI Check (${{ matrix.project }})
-          conclusion: ${{ job.status }}
+          runCmd: |
+            docker logs home-site
+            CI=true npx nx run-many -t lint test
 
-  aggregate:
-    name: Aggregate results
+  release:
+    name: Release
+    needs: intergration
+    if: ${{ github.event_name }} == 'push'
     runs-on: ubuntu-latest
-    needs: affected-check
-    if: always()
+    outputs:
+      released: ${{ steps.release.outputs.releases_created }}
+      projects: ${{ steps.packages.outputs.projects }}
     steps:
-      - uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: CI Check
-          conclusion: ${{needs.affected-check.result == 'skipped' && 'success' || needs.affected-check.result}}
+          token: ${{ secrets.GH_BOT_TOKEN }}
+          config-file: release-config.json
+          manifest-file: release-manifest.json
+      - name: Prepare list released packages
+        id: packages
+        if: steps.release.outputs.releases_created == 'true'
+        run: |
+          paths_released=$(echo '${{ steps.release.outputs.paths_released }}' | jq -r '. | .[]')
+          echo "Release paths: ${paths_released[@]}"
+
+          projects=()
+          for projectPath in $paths_released; do
+             if [[ "$projectPath" != "." ]]; then
+                projectFile="$projectPath/project.json"
+                projectName=$(jq -r '.name' "$projectFile")
+                projects+=("$projectName")
+            fi
+          done
+          echo "Projects: ${applications[@]}"
+          echo "projects=$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s . | jq -c .)" >> $GITHUB_OUTPUT
+
+  delivery:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: release
+    if: ${{ needs.release.outputs.released == 'true' && needs.release.outputs.projects != '[""]' }}
+    strategy:
+      matrix:
+        project: ${{fromJson(needs.release.outputs.projects)}}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: ./.github/actions/setup
+        with:
+          dependencies: true
+          buildx: true
+
+      - name: Login to Docker Hub container registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_BOT_TOKEN }}
+
+      - run: npx nx publish ${{ matrix.project }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
 
 
