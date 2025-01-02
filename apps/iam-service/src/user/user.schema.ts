@@ -1,50 +1,36 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { GeneratedSecret } from 'speakeasy';
-
-@Schema()
-export class UserSecret implements GeneratedSecret {
-  @Prop()
-  ascii: string;
-
-  @Prop()
-  hex: string;
-
-  @Prop()
-  base32: string;
-
-  @Prop()
-  google_auth_qr: string;
-
-  @Prop()
-  otpauth_url?: string;
-}
-export const UserSecretSchema = SchemaFactory.createForClass(UserSecret);
+import { InjectModel, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Model } from 'mongoose';
+import { HOTP } from './hotp';
+import { TOTP } from './totp';
 
 @Schema({ versionKey: false })
 export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ type: UserSecretSchema })
-  secret: UserSecret;
+  @Prop({ required: true })
+  firstName: string;
 
-  @Prop({ type: String })
-  firstName?: string;
+  @Prop()
+  middleName?: string;
 
-  @Prop({ type: String })
-  midleName?: string;
+  @Prop({ required: true })
+  lastName: string;
 
-  @Prop({ type: String })
-  lastName?: string;
+  @Prop({ required: true })
+  createdAt: Date;
 
-  @Prop({ type: Date })
-  registedAt: Date;
+  @Prop()
+  activedAt?: Date;
 
-  @Prop({ type: Date })
-  onboardedAt?: Date;
+  @Prop({ type: HOTP })
+  hotp: HOTP;
 
-  @Prop({ type: Number, default: 1 })
-  hotpCounter: number;
+  @Prop({ type: TOTP })
+  totp?: TOTP;
 }
 
+export const InjectUserModel = () => InjectModel(User.name);
+export type UserModel = Model<User>;
+export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);

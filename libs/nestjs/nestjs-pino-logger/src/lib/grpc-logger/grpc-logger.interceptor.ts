@@ -3,14 +3,12 @@ import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } fr
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
-
-import { PinoLoggerService } from '../pino-logger';
-
 import { GrpcLoggerOptions } from './grpc-logger.options';
+import { PinoLogger } from '../pino-logger';
 
 @Injectable()
 export class GrpcLoggerInterceptor implements NestInterceptor {
-  private logger = new PinoLoggerService(GrpcLoggerInterceptor.name);
+  private logger = new PinoLogger(GrpcLoggerInterceptor.name);
 
   constructor(@Inject('GRPC_LOGGER_OPTIONS') private readonly options: GrpcLoggerOptions) {}
 

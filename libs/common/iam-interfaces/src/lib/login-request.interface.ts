@@ -1,4 +1,4 @@
-export interface ICredential {
+export interface ILoginRequest {
   email: string;
   otp: string;
 }

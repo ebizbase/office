@@ -1,2 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-module.exports = async function () {};
+import axios from 'axios';
+
+module.exports = async function () {
+  axios.defaults.validateStatus = () => true;
+};

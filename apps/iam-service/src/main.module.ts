@@ -5,22 +5,14 @@ import { Module } from '@nestjs/common';
 import { HealthyModule } from './healthy/healthy.module';
 import { UserModule } from './user/user.module';
 import { AuthenticateModule } from './authenticate/authenticate.module';
-import { JwtModule } from '@nestjs/jwt';
+import { UserSessionModule } from './user-session/user-session.module';
+import { TenantModule } from './tenant/tenant.module';
+import { AccessTokenModule } from './access-token/access-token.module';
+import { MeModule } from './me/me.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
-    JwtModule.registerAsync({
-      global: true,
-      useFactory: () => {
-        const secret = process.env['TOKEN_SECRET'];
-        if (!secret) {
-          throw new Error('Missing TOKEN_SECRET environment variable');
-        }
-        return {
-          secret: process.env['TOKEN_SECRET'],
-        };
-      },
-    }),
     MongoModule.register('iam-service'),
     NodeMailerModule.register(),
     RabbitModule.register({
@@ -34,8 +26,13 @@ import { JwtModule } from '@nestjs/jwt';
       ],
     }),
     HealthyModule,
-    UserModule,
+    AccessTokenModule,
     AuthenticateModule,
+    MeModule,
+    MailerModule,
+    UserModule,
+    TenantModule,
+    UserSessionModule,
   ],
 })
 export class MainModule {}

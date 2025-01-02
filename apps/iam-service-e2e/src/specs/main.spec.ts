@@ -1,73 +1,111 @@
-import {
-  MailHogClient,
-  MailHogTesting,
-  RabbitMQClient,
-  RabbitMQTesting,
-} from '@ebizbase/testing-utils';
 import axios from 'axios';
 import { execSync } from 'child_process';
 import { join } from 'path';
-import { v1 as uuidv1 } from 'uuid';
+import {
+  clearEmails,
+  createTenant,
+  createUserInfo,
+  deleteTenant,
+  getBelongTenants,
+  getOtpFromEmail,
+  getUserInfo,
+  loginWithOtp,
+  registerAndLogin,
+  registerUser,
+  renewToken,
+} from '../support/helpers';
 
 describe('Mailer Service - Main features', () => {
-  let rabbitmq: RabbitMQClient;
-  let mailhog: MailHogClient;
+  const BASE_URL = 'http://iam-service.fbi.com';
+  const TIMEOUTS = {
+    SETUP: 120_000,
+  };
 
   beforeEach(async () => {
     execSync('docker-compose up -d --wait', {
       cwd: join(__dirname, '../../../../'),
-      stdio: 'ignore',
     });
-    rabbitmq = await new RabbitMQTesting().getClient();
-    mailhog = await MailHogTesting.getClient();
-  }, 120_000);
+  }, TIMEOUTS.SETUP);
 
-  afterEach(async () => {
-    await rabbitmq?.close();
-  }, 20_000);
+  describe('Authentication', () => {
+    describe('OTP Scenarios', () => {
+      test.each([
+        { case: 'Login with old OTP should fail', useOldOtp: true, expectedStatus: 401 },
+        { case: 'Login with new OTP should succeed', useOldOtp: false, expectedStatus: 200 },
+      ])('$case', async ({ useOldOtp, expectedStatus }) => {
+        const userInfo = createUserInfo();
 
-  it('should liveness health check is successful', async () => {
-    const { status } = await axios.get('http://iam-service.fbi.com/healthy/liveness');
-    expect(status).toBe(200);
-  }, 20_000);
+        // Step 1: Register user and get OTP
+        await registerUser(userInfo);
+        const firstOtp = await getOtpFromEmail(userInfo.email);
+        await clearEmails();
 
-  it('should readiness health check is successful', async () => {
-    const { status } = await axios.get('http://iam-service.fbi.com/healthy/readiness');
-    expect(status).toBe(200);
-  }, 20_000);
+        // Step 2: Register again to generate new OTP
+        await registerUser(userInfo);
+        const newOtp = await getOtpFromEmail(userInfo.email);
 
-  describe('Registering Follow', () => {
-    const email = uuidv1() + '@example.com';
-    let otp: string;
+        // Step 3: Attempt login
+        const otpToUse = useOldOtp ? firstOtp : newOtp;
+        const response = await axios.post(`${BASE_URL}/authenticate/login`, {
+          email: userInfo.email,
+          otp: otpToUse,
+        });
 
-    it('should registering success', async () => {
-      const { status, data } = await axios.post(
-        'http://iam-service.fbi.com/authenticate/register',
-        { email }
-      );
-      console.log('data', data);
-      expect(status).toBe(201);
+        expect(response.status).toBe(expectedStatus);
+      });
     });
 
-    it('should received otp email', async () => {
-      const receivedMails = await mailhog.waitForEmail(email);
-      expect(receivedMails).toHaveLength(1);
-      expect(receivedMails[0].Content.Headers['Subject'][0]).toBe(
-        '[nBiz] Your OTP for your account'
-      );
+    it('should renew token and validate user info', async () => {
+      const userInfo = createUserInfo();
 
-      const regex = /Your OTP is (\d{6})/;
-      const match = receivedMails[0].Content.Body.match(regex);
-      expect(match).not.toBeNull();
-      expect(match[1]).toHaveLength(6);
+      // Register and get access token
+      await registerUser(userInfo);
+      const otp = await getOtpFromEmail(userInfo.email);
+      const loginResponse = await loginWithOtp(userInfo.email, otp);
 
-      otp = match[1];
+      // Validate user info
+      const userInfoResponse = await getUserInfo(loginResponse.accessToken);
+
+      // Renew token
+      const renewResponse = await renewToken(loginResponse.refreshToken);
+
+      // Validate new token
+      const newUserInfoResponse = await getUserInfo(renewResponse.accessToken);
+      expect(newUserInfoResponse).toEqual(userInfoResponse);
+    });
+  });
+
+  describe('Tenant Management', () => {
+    it('should create and delete tenants', async () => {
+      const { accessToken, email } = await registerAndLogin();
+
+      // Create tenants
+      const tenants = await Promise.all([createTenant(accessToken), createTenant(accessToken)]);
+      expect(await getBelongTenants(accessToken)).toHaveLength(2);
+
+      // Delete a tenant
+      const otp = await getOtpFromEmail(email);
+      await deleteTenant(tenants[0]._id, otp, accessToken);
+
+      // Verify remaining tenants
+      expect(await getBelongTenants(accessToken)).toHaveLength(1);
     });
 
-    it('should verify otp success', async () => {
-      // const { status } = await axios.post('http://iam-service.fbi.com/authenticate/verify-otp', { email, otp });
-      // expect(status).toBe(200);
-      console.log('otp', otp);
+    it('should not delete tenant with invalid OTP', async () => {
+      const { accessToken, email } = await registerAndLogin();
+
+      // Create tenant
+      const tenant = await createTenant(accessToken);
+      const otp = await getOtpFromEmail(email);
+
+      // Modify OTP (simulate invalid OTP)
+      const invalidOtp = otp.slice(0, -1) + 'X';
+
+      // Attempt deletion
+      const response = await deleteTenant(tenant._id, invalidOtp, accessToken);
+
+      // Verify failure
+      expect(response.status).toBe(400);
     });
   });
 });

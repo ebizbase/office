@@ -30,9 +30,9 @@ services:
       - traefik.http.services.mongodb-admin.loadbalancer.server.port=8081
     healthcheck:
       test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   redis:
@@ -47,9 +47,9 @@ services:
       - traefik.http.services.redis-admin.loadbalancer.server.port=8081
     healthcheck:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   rabbitmq:
@@ -66,9 +66,9 @@ services:
       - traefik.http.services.rabbitmq-admin.loadbalancer.server.port=15672
     healthcheck:
       test: rabbitmq-diagnostics -q ping
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   mailhog:
@@ -82,10 +82,10 @@ services:
       - traefik.http.routers.mailhog-admin.entrypoints=web
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
     healthcheck:
-      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:8025']
-      interval: 5s
+      test: wget --spider -q http://localhost:8025
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   minio:
@@ -107,9 +107,9 @@ services:
       - traefik.http.services.minio.loadbalancer.server.port=9000
     healthcheck:
       test: ['CMD', 'mc', 'ready', 'local']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   mailer-service:
@@ -118,14 +118,15 @@ services:
       args:
         SERVICE: mailer-service
     container_name: mailer-service
+    restart: unless-stopped
     expose:
       - 3000
     volumes:
       - .:/workspace
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       mongodb:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       mailhog:
         condition: service_healthy
@@ -140,6 +141,12 @@ services:
       - traefik.http.routers.mailer-service.rule=Host(`mailer-service.fbi.com`)
       - traefik.http.routers.mailer-service.entrypoints=web
       - traefik.http.services.mailer-service.loadbalancer.server.port=3000
+    healthcheck:
+      test: wget --spider -q http://127.0.0.1:3000/healthy/readiness
+      interval: 1s
+      timeout: 5s
+      retries: 60
+      start_period: 60s
 
   iam-service:
     build:
@@ -147,14 +154,15 @@ services:
       args:
         SERVICE: iam-service
     container_name: iam-service
+    restart: unless-stopped
     expose:
       - 3000
     volumes:
       - .:/workspace
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       mongodb:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       mailhog:
         condition: service_healthy
@@ -162,7 +170,7 @@ services:
       - PORT=3000
       - TOKEN_SECRET=secret
       - ACCESS_TOKEN_EXPIRES=1s
-      - REFRESH_TOKEN_EXPIRES=10s
+      - REFRESH_TOKEN_EXPIRES=1s
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
       - SMTP_URI=smtp://mailhog:1025
@@ -171,3 +179,35 @@ services:
       - traefik.http.routers.iam-service.rule=Host(`iam-service.fbi.com`)
       - traefik.http.routers.iam-service.entrypoints=web
       - traefik.http.services.iam-service.loadbalancer.server.port=3000
+    healthcheck:
+      test: wget --spider -q http://127.0.0.1:3000/healthy/readiness
+      interval: 1s
+      timeout: 5s
+      retries: 60
+      start_period: 60s
+
+  home-site:
+    build:
+      dockerfile: Dockerfile.site
+      args:
+        SITE: home-site
+    container_name: home-site
+    restart: unless-stopped
+    user: 1000:1000
+    expose:
+      - 4000
+    volumes:
+      - .:/workspace
+    environment:
+      - PORT=4000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.home-site.rule=Host(`fbi.com`)
+      - traefik.http.routers.home-site.entrypoints=web
+      - traefik.http.services.home-site.loadbalancer.server.port=4000
+    healthcheck:
+      test: wget --spider -q http://127.0.0.1:4000
+      interval: 5s
+      timeout: 5s
+      retries: 120
+      start_period: 120s
