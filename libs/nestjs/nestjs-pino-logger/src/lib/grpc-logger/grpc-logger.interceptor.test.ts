@@ -2,7 +2,7 @@ import { Metadata } from '@grpc/grpc-js';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
 
-import { PinoLoggerService } from '../pino-logger';
+import { PinoLogger } from '../pino-logger';
 
 import { GrpcLoggerInterceptor } from './grpc-logger.interceptor';
 import { GrpcLoggerOptions } from './grpc-logger.options';
@@ -12,7 +12,7 @@ jest.mock('uuid', () => ({ v4: jest.fn(() => 'test-uuid') }));
 
 describe('GrpcLoggerInterceptor', () => {
   let interceptor: GrpcLoggerInterceptor;
-  let logger: jest.Mocked<PinoLoggerService>;
+  let logger: jest.Mocked<PinoLogger>;
 
   const mockOptions: GrpcLoggerOptions = {
     slowWarningExecutionTime: 100, // Thay đổi giá trị theo yêu cầu
@@ -35,7 +35,7 @@ describe('GrpcLoggerInterceptor', () => {
   };
 
   beforeEach(() => {
-    logger = new PinoLoggerService('GrpcLoggerInterceptor') as jest.Mocked<PinoLoggerService>;
+    logger = new PinoLogger('GrpcLoggerInterceptor') as jest.Mocked<PinoLogger>;
     interceptor = new GrpcLoggerInterceptor(mockOptions);
     interceptor['logger'] = logger; // Gán logger mock cho interceptor
   });

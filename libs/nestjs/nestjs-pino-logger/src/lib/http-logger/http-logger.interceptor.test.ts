@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
 import { Request, Response } from 'express';
 
-import { PinoLoggerService } from '../pino-logger';
+import { PinoLogger } from '../pino-logger';
 
 import { HttpLoggerInterceptor } from './http-logger.interceptor';
 import { HttpLoggerOptions } from './http-logger.options';
@@ -12,7 +12,7 @@ jest.mock('uuid', () => ({ v4: jest.fn(() => 'test-uuid') }));
 
 describe('HttpLoggerInterceptor', () => {
   let interceptor: HttpLoggerInterceptor;
-  let logger: jest.Mocked<PinoLoggerService>;
+  let logger: jest.Mocked<PinoLogger>;
 
   const mockOptions: HttpLoggerOptions = {
     slowWarningExecutionTime: 100, // Thay đổi giá trị theo yêu cầu
@@ -28,7 +28,7 @@ describe('HttpLoggerInterceptor', () => {
   };
 
   beforeEach(() => {
-    logger = new PinoLoggerService('HttpLoggerInterceptor') as jest.Mocked<PinoLoggerService>;
+    logger = new PinoLogger('HttpLoggerInterceptor') as jest.Mocked<PinoLogger>;
     interceptor = new HttpLoggerInterceptor(mockOptions);
     interceptor['logger'] = logger; // Gán logger mock cho interceptor
   });
