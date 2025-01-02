@@ -1,13 +1,15 @@
+name: ebizbase
 services:
   traefik:
     image: 'traefik:v3.2@sha256:efb87236c8c92599bcd3a67a7a8a55e0f255665f4719722bf398935aa9b92270'
-    container_name: 'traefik'
     command:
       - --log.level=DEBUG
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
-      - --entryPoints.web.address=:80
+      - --entryPoints.http.address=:80
+      - --entryPoints.amqp.address=:5672
+      - --entryPoints.mongo.address=:27017
     ports:
       - 80:80
     volumes:
@@ -20,79 +22,70 @@ services:
 
   mongodb:
     image: ghcr.io/ebizbase/mongodev:latest@sha256:067acd2559e8804320590478ec2b1b108acdd5f8c37e14fc17ff7e35b6cb2abc
-    container_name: mongodb
     ports:
       - 27017:27017
     labels:
       - traefik.enable=true
       - traefik.http.routers.mongodb-admin.rule=Host(`mongodb.fbi.com`)
-      - traefik.http.routers.mongodb-admin.entrypoints=web
+      - traefik.http.routers.mongodb-admin.entrypoints=http
       - traefik.http.services.mongodb-admin.loadbalancer.server.port=8081
     healthcheck:
       test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   redis:
     image: ghcr.io/ebizbase/redisdev:latest@sha256:71c75f02ae1d4e23d620ac2feae1e51b99945aba68077744956bb77a70166503
-    container_name: redis
     ports:
       - 6379:6379
     labels:
       - traefik.enable=true
       - traefik.http.routers.redis-admin.rule=Host(`redis.fbi.com`)
-      - traefik.http.routers.redis-admin.entrypoints=web
+      - traefik.http.routers.redis-admin.entrypoints=http
       - traefik.http.services.redis-admin.loadbalancer.server.port=8081
     healthcheck:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   rabbitmq:
     build:
       context: .
       dockerfile: Dockerfile.rabbitmq
-    container_name: rabbitmq
     ports:
       - 5672:5672
     labels:
       - traefik.enable=true
       - traefik.http.routers.rabbitmq-admin.rule=Host(`rabbitmq.fbi.com`)
-      - traefik.http.routers.rabbitmq-admin.entrypoints=web
+      - traefik.http.routers.rabbitmq-admin.entrypoints=http
       - traefik.http.services.rabbitmq-admin.loadbalancer.server.port=15672
     healthcheck:
       test: rabbitmq-diagnostics -q ping
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   mailhog:
     image: mailhog/mailhog@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
-    container_name: mailhog
-    ports:
-      - 1025:1025
     labels:
       - traefik.enable=true
       - traefik.http.routers.mailhog-admin.rule=Host(`mail.fbi.com`)
-      - traefik.http.routers.mailhog-admin.entrypoints=web
+      - traefik.http.routers.mailhog-admin.entrypoints=http
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
     healthcheck:
-      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:8025']
-      interval: 5s
+      test: wget --spider -q http://localhost:8025
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   minio:
     image: quay.io/minio/minio@sha256:1dce27c494a16bae114774f1cec295493f3613142713130c2d22dd5696be6ad3
-    container_name: minio
-    ports:
-      - 9000:9000
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_PASSWORD: minioadmin
@@ -100,37 +93,21 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.minio-admin.rule=Host(`minio.fbi.com`)
-      - traefik.http.routers.minio-admin.entrypoints=web
+      - traefik.http.routers.minio-admin.entrypoints=http
       - traefik.http.services.minio-admin.loadbalancer.server.port=9001
       - traefik.http.routers.minio.rule=Host(`files.fbi.com`)
-      - traefik.http.routers.minio.entrypoints=web
+      - traefik.http.routers.minio.entrypoints=http
       - traefik.http.services.minio.loadbalancer.server.port=9000
     healthcheck:
       test: ['CMD', 'mc', 'ready', 'local']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 10s
       retries: 3
 
   mailer-service:
-    build:
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE: mailer-service
-    container_name: mailer-service
-    expose:
-      - 3000
-    volumes:
-      - .:/workspace
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-      mailhog:
-        condition: service_healthy
+    image: ebizbase/mailer-service:edge
     environment:
-      - PORT=3000
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
       - SMTP_URI=smtp://mailhog:1025
@@ -138,36 +115,56 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.mailer-service.rule=Host(`mailer-service.fbi.com`)
-      - traefik.http.routers.mailer-service.entrypoints=web
+      - traefik.http.routers.mailer-service.entrypoints=http
       - traefik.http.services.mailer-service.loadbalancer.server.port=3000
-
-  iam-service:
-    build:
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE: iam-service
-    container_name: iam-service
-    expose:
-      - 3000
-    volumes:
-      - .:/workspace
     depends_on:
       rabbitmq:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-      mailhog:
-        condition: service_healthy
+    healthcheck:
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000/healthy/readiness']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  iam-service:
+    image: ebizbase/iam-service:edge
     environment:
-      - PORT=3000
       - TOKEN_SECRET=secret
       - ACCESS_TOKEN_EXPIRES=1s
-      - REFRESH_TOKEN_EXPIRES=10s
+      - REFRESH_TOKEN_EXPIRES=1s
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
       - SMTP_URI=smtp://mailhog:1025
     labels:
       - traefik.enable=true
       - traefik.http.routers.iam-service.rule=Host(`iam-service.fbi.com`)
-      - traefik.http.routers.iam-service.entrypoints=web
+      - traefik.http.routers.iam-service.entrypoints=http
       - traefik.http.services.iam-service.loadbalancer.server.port=3000
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000/healthy/readiness']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  home-site:
+    image: ebizbase/home-site:edge
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.home-site.rule=Host(`fbi.com`)
+      - traefik.http.routers.home-site.entrypoints=http
+      - traefik.http.services.home-site.loadbalancer.server.port=3000
+    healthcheck:
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

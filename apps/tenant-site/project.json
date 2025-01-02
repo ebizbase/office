@@ -1,0 +1,148 @@
+{
+  "name": "tenant-site",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "tenant",
+  "sourceRoot": "apps/tenant-site/src",
+  "tags": ["sites"],
+  "metadata": {
+    "version": "0.0.0",
+    "namespace": "ebizbase/tenant-site"
+  },
+  "targets": {
+    "browser": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/tenant-site/browser",
+        "index": "apps/tenant-site/src/index.html",
+        "main": "apps/tenant-site/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/tenant-site/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/tenant-site/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/@taiga-ui/icons/src",
+            "output": "assets/taiga-ui/icons"
+          }
+        ],
+        "styles": [
+          "@taiga-ui/core/styles/taiga-ui-theme.less",
+          "@taiga-ui/core/styles/taiga-ui-fonts.less",
+          "@taiga-ui/addon-mobile/styles/taiga-ui-mobile.less",
+          "apps/tenant-site/src/styles.scss"
+        ],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "compile": {
+      "dependsOn": ["browser"],
+      "executor": "@angular-devkit/build-angular:server",
+      "options": {
+        "outputPath": "dist/apps/tenant-site/server",
+        "main": "apps/tenant-site/server.ts",
+        "tsConfig": "apps/tenant-site/tsconfig.server.json",
+        "inlineStyleLanguage": "scss"
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "media"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "sourceMap": true,
+          "extractLicenses": false,
+          "vendorChunk": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:ssr-dev-server",
+      "options": {
+        "port": 4200
+      },
+      "configurations": {
+        "development": {
+          "browserTarget": "tenant-site:browser:development",
+          "serverTarget": "tenant-site:compile:development"
+        },
+        "production": {
+          "browserTarget": "tenant-site:browser:production",
+          "serverTarget": "tenant-site:compile:production"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "tenant-site:browser"
+      }
+    },
+    "prerender": {
+      "executor": "@angular-devkit/build-angular:prerender",
+      "options": {
+        "routes": ["/"]
+      },
+      "configurations": {
+        "development": {
+          "browserTarget": "tenant-site:browser:development",
+          "serverTarget": "tenant-site:compile:development"
+        },
+        "production": {
+          "browserTarget": "tenant-site:browser:production",
+          "serverTarget": "tenant-site:compile:production"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "build": {
+      "dependsOn": ["compile"],
+      "executor": "@ebizbase/nx-docker:build",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "load": true,
+          "tags": ["edge"]
+        },
+        "production": {
+          "push": true,
+          "tags": ["{major}.{minor}.{patch}"]
+        }
+      }
+    }
+  }
+}

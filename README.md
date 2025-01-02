@@ -1,6 +1,6 @@
 <img src="docs/assets/logo.png" alt="Ebizbase dev-infras logo" title="Ebizbase dev-infras logo" align="right" width="56" height="56">
 
-# [Ebizbase Office](https://github.com/ebizbase/office)
+# [Ebizbase Office](https://github.com/ebizbase/ebizbase)
 
 <a id="readme-top"></a>
 
@@ -9,9 +9,7 @@
 [![Contributors][contributors-shield]][contributors-url]
 [![MIT License][license-shield]][license-url]
 
-
 ## About this project
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -26,8 +24,8 @@ See [Contribution Guidelines][contribution-guidelines-url] for more information.
 
 ### Contributors
 
-<a href="https://github.com/ebizbase/office/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ebizbase/office" alt="ebizbase/office top contributors" />
+<a href="https://github.com/ebizbase/ebizbase/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ebizbase/ebizbase" alt="ebizbase/ebizbase top contributors" />
 </a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -38,28 +36,28 @@ Distributed under the MIT License. See [LICENSE][license-url] for more informati
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[codefactor-shield]: https://img.shields.io/codefactor/grade/github/ebizbase/office
-[codefactor-url]: https://www.codefactor.io/repository/github/ebizbase/office
-[contributors-shield]: https://img.shields.io/github/contributors/ebizbase/office.svg
-[contributors-url]: https://github.com/ebizbase/office/graphs/contributors
-[issues-shield]: https://img.shields.io/github/issues/ebizbase/office.svg
-[issues-url]: https://github.com/ebizbase/office/issues
-[license-shield]: https://img.shields.io/github/license/ebizbase/office.svg
-[license-url]: https://github.com/ebizbase/office/blob/main/LICENSE.txt
-[contribution-guidelines-url]: https://github.com/ebizbase/office/blob/main/CONTRIBUTING.md
-[npm-playwright-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-features/npm-playwright/README.md
-[omz-plugin-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-features/omz-plugin/README.md
-[install-npm-package-globally-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-features/install-npm-package-globally/README.md
-[powerlevel10k-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-features/powerlevel10k/README.md
-[base-devcontainer-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-images/base-devcontainer/README.md
-[node-devcontainer-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-images/node-devcontainer/README.md
-[node-dind-devcontainer-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-images/node-dind-devcontainer/README.md
-[node-playwright-devcontainer-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-images/node-playwright-devcontainer/README.md
-[node-dind-playwright-devcontainer-readme]: https://github.com/ebizbase/office/blob/main/devcontainer-images/node-dind-playwright-devcontainer/README.md
-[nx-devkit-readme]: https://github.com/ebizbase/office/blob/main/packages/nx-devkit/README.md
-[nx-docker-readme]: https://github.com/ebizbase/office/blob/main/packages/nx-docker/README.md
-[nx-dive-readme]: https://github.com/ebizbase/office/blob/main/packages/nx-dive/README.md
-[node-distroless-readme]: https://github.com/ebizbase/office/blob/main/images/node-distroless/README.md
-[nginx-spa-readme]: https://github.com/ebizbase/office/blob/main/images/nginx-spa/README.md
-[mongodev-readme]: https://github.com/ebizbase/office/blob/main/images/mongodev/README.md
-[redisdev-readme]: https://github.com/ebizbase/office/blob/main/images/redisdev/README.md
+[codefactor-shield]: https://img.shields.io/codefactor/grade/github/ebizbase/ebizbase
+[codefactor-url]: https://www.codefactor.io/repository/github/ebizbase/ebizbase
+[contributors-shield]: https://img.shields.io/github/contributors/ebizbase/ebizbase.svg
+[contributors-url]: https://github.com/ebizbase/ebizbase/graphs/contributors
+[issues-shield]: https://img.shields.io/github/issues/ebizbase/ebizbase.svg
+[issues-url]: https://github.com/ebizbase/ebizbase/issues
+[license-shield]: https://img.shields.io/github/license/ebizbase/ebizbase.svg
+[license-url]: https://github.com/ebizbase/ebizbase/blob/main/LICENSE.txt
+[contribution-guidelines-url]: https://github.com/ebizbase/ebizbase/blob/main/CONTRIBUTING.md
+[npm-playwright-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-features/npm-playwright/README.md
+[omz-plugin-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-features/omz-plugin/README.md
+[install-npm-package-globally-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-features/install-npm-package-globally/README.md
+[powerlevel10k-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-features/powerlevel10k/README.md
+[base-devcontainer-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-images/base-devcontainer/README.md
+[node-devcontainer-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-images/node-devcontainer/README.md
+[node-dind-devcontainer-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-images/node-dind-devcontainer/README.md
+[node-playwright-devcontainer-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-images/node-playwright-devcontainer/README.md
+[node-dind-playwright-devcontainer-readme]: https://github.com/ebizbase/ebizbase/blob/main/devcontainer-images/node-dind-playwright-devcontainer/README.md
+[nx-devkit-readme]: https://github.com/ebizbase/ebizbase/blob/main/packages/nx-devkit/README.md
+[nx-docker-readme]: https://github.com/ebizbase/ebizbase/blob/main/packages/nx-docker/README.md
+[nx-dive-readme]: https://github.com/ebizbase/ebizbase/blob/main/packages/nx-dive/README.md
+[node-distroless-readme]: https://github.com/ebizbase/ebizbase/blob/main/images/node-distroless/README.md
+[nginx-spa-readme]: https://github.com/ebizbase/ebizbase/blob/main/images/nginx-spa/README.md
+[mongodev-readme]: https://github.com/ebizbase/ebizbase/blob/main/images/mongodev/README.md
+[redisdev-readme]: https://github.com/ebizbase/ebizbase/blob/main/images/redisdev/README.md

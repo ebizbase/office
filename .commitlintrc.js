@@ -1,5 +1,5 @@
 
-const {COMMIT_TYPES: TYPES, COMMIT_SCOPES: SCOPES}  = require('./rules.js');
+const {COMMIT_TYPES: TYPES, COMMIT_SCOPES: SCOPES}  = require('./project-rules.js');
 
 module.exports = {
   extends: ['@commitlint/config-conventional'],

@@ -6,8 +6,10 @@
   "mounts": [
     "source=ebizbase-office-devcontainer-dind,target=/var/lib/docker,type=volume"
   ],
+  "containerUser": "vscode",
   "remoteUser": "vscode",
-  "postStartCommand": "npm i -g nx && yarn install",
+  "postCreateCommand": "npm install -g nx",
+  "postStartCommand": "yarn install",
   "appPort": 80,
   "customizations": {
     "vscode": {

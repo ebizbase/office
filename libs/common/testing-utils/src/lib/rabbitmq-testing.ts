@@ -13,19 +13,23 @@ export class RabbitMQTesting {
   ) {}
 
   public async getClient(): Promise<RabbitMQClient> {
-    const connection = await amqp.connect({
-      protocol: 'amqp',
-      port: this.port,
-      hostname: this.host,
-    });
-    const channel = await connection.createChannel();
-    return {
-      connection,
-      chanel: channel,
-      close: async () => {
-        await channel.close();
-        await connection.close();
-      },
-    };
+    try {
+      const connection = await amqp.connect({
+        protocol: 'amqp',
+        port: this.port,
+        hostname: this.host,
+      });
+      const channel = await connection.createChannel();
+      return {
+        connection,
+        chanel: channel,
+        close: async () => {
+          await channel.close();
+          await connection.close();
+        },
+      };
+    } catch (err) {
+      throw new Error('Error when connect to rabbitmq server: ' + err);
+    }
   }
 }

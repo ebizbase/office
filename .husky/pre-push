@@ -1,8 +1,10 @@
 start_time=$(date +%s)
 echo "Running pre-push hook..."
 
-npx nx affected --base=origin/main -t test --output-style stream
-npx nx affected --base=origin/main -t e2e --output-style stream
+npx nx affected --base=origin/main -t test
+nx run-many -t build
+docker compose up -d --wait
+npx nx affected --base=origin/main -t automate
 
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))

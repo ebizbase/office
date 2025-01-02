@@ -1,7 +1,7 @@
 {
   "name": "@ebizbase/nx-internal",
   "private": true,
-  "description": "Nx plugin for internal use @ebizbase/office project",
+  "description": "Nx plugin for internal use @ebizbase/ebizbase project",
   "type": "commonjs",
   "main": "./src/index.js",
   "typings": "./src/index.d.ts",

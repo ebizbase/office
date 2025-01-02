@@ -1,3 +1,3 @@
 # nx
 
-The nx plugin using internal @ebizbase/office project
+The nx plugin using internal @ebizbase/ebizbase project

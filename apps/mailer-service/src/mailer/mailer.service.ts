@@ -51,36 +51,18 @@ export class MailerService implements OnModuleInit {
       throw new Error(`Template not found for event: ${event}`);
     }
 
-    let html;
-    try {
-      const htmlTemplate = compile(template.html);
-      html = htmlTemplate(data);
-    } catch (error) {
-      this.logger.error(`Error on compiling html template. ${error.message}`, error.stack);
-      throw error;
-    }
-
-    let text;
-    try {
-      const textTemplate = compile(template.text);
-      text = textTemplate(data);
-    } catch (error) {
-      this.logger.error(`Error on compiling text template. ${error.message}`, error.stack);
-      throw error;
-    }
-
-    let subject;
-    try {
-      const subjectTemplate = compile(template.subject);
-      subject = subjectTemplate(data);
-    } catch (error) {
-      this.logger.error(`Error on compiling subject template. ${error.message}`, error.stack);
-      throw error;
-    }
+    const html = await this.compileTemplate(template.html, data);
+    const text = await this.compileTemplate(template.text, data);
+    const subject = await this.compileTemplate(template.subject, data);
 
     try {
-      const mail: IMail = { from: this.transactionEmailSender, to, html, text, subject };
-      await this.amqpConnection.publish('mail_exchange', 'send', mail);
+      await this.amqpConnection.publish('mail_exchange', 'send', {
+        from: this.transactionEmailSender,
+        to,
+        html,
+        text,
+        subject,
+      });
     } catch (error) {
       this.logger.error(`Error on sending transaction email. ${error.message}`, error.stack);
       throw error;
@@ -110,6 +92,16 @@ export class MailerService implements OnModuleInit {
       });
     } catch (error) {
       this.logger.error(`Error on sending email. ${error.message}`, error.stack);
+    }
+  }
+
+  private async compileTemplate(content: string, data: Record<string, unknown>): Promise<string> {
+    try {
+      const template = compile(content);
+      return template(data);
+    } catch (error) {
+      this.logger.error(`Error compiling template: ${error.message}`, error.stack);
+      throw error;
     }
   }
 }

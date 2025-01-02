@@ -6,7 +6,7 @@
   "tags": ["services"],
   "metadata": {
     "version": "0.0.0",
-    "namespace": "ebizbase/office-transactional-mailer-service"
+    "namespace": "ebizbase/mailer-service"
   },
   "targets": {
     "compile": {

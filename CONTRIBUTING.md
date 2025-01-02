@@ -15,7 +15,7 @@ The following is a set of guidelines for contributing to this project. These are
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Contributor Covenant Code of Conduct](https://github.com/ebizbase/office/blob/main/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [INSERT CONTACT EMAIL].
+This project and everyone participating in it is governed by the [Contributor Covenant Code of Conduct](https://github.com/ebizbase/ebizbase/blob/main/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [INSERT CONTACT EMAIL].
 
 ## How Can I Contribute?
 
