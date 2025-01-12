@@ -33,13 +33,13 @@ export class AuthenticateController {
     await this.authenticateService.register(userInfo);
   }
 
-  @Post('login')
+  @Post('sign-in')
   @HttpCode(200)
   async login(
     @Body() credential: ILoginRequest,
     @Headers() headers: Dict<string>
   ): Promise<ILoginResponse> {
-    this.logger.debug({ msg: 'Loging', credential });
+    this.logger.debug({ msg: 'Signing in', credential });
     return this.authenticateService.login(credential, headers);
   }
 

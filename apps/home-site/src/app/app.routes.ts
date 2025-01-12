@@ -1,9 +1,10 @@
 import { Route } from '@angular/router';
 import { AuthLayoutComponent } from './core/components/auth-layout.component';
+import { MainLayoutComponent } from './core/components/main-layout.component';
 
 export const appRoutes: Route[] = [
   {
-    path: '',
+    path: 'authenticate',
     component: AuthLayoutComponent,
     children: [
       {
@@ -13,8 +14,8 @@ export const appRoutes: Route[] = [
       },
     ],
   },
-  // {
-  //   path: '**',
-  //   component: NotFoundComponent,
-  // },
+  {
+    path: '**',
+    component: MainLayoutComponent,
+  },
 ];

@@ -35,6 +35,7 @@
       "@ebizbase/nestjs-node-mailer": ["libs/nestjs/nestjs-node-mailer/src/index.ts"],
       "@ebizbase/nestjs-pino-logger": ["libs/nestjs/nestjs-pino-logger/src/index.ts"],
       "@ebizbase/nestjs-rabbit": ["libs/nestjs/nestjs-rabbit/src/index.ts"],
+      "@ebizbase/ng-ui": ["libs/angular/ng-ui/src/index.ts"],
       "@ebizbase/nx-internal": ["tools/nx-internal/src/index.ts"],
       "@ebizbase/testing-utils": ["libs/common/testing-utils/src/index.ts"]
     }
