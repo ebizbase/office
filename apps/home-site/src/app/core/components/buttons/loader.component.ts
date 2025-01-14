@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TuiButton, TuiLoader } from '@taiga-ui/core';
 
 @Component({
-  selector: 'home-loader-button',
+  selector: 'app-loader-button',
   imports: [TuiButton, TuiLoader],
   template: `
     <tui-loader class="loader" [overlay]="loadingOverlay" [showLoader]="isLoading">

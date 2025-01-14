@@ -191,3 +191,25 @@ services:
       timeout: 5s
       retries: 15
       start_period: 30s
+
+  accounts-site:
+    build:
+      dockerfile: Dockerfile.site
+    container_name: accounts-site
+    volumes:
+      - .:/workspace
+      - ./.angular/deployment:/workspace/.angular
+      - ./dist/deployment:/workspace/dist
+    environment:
+      - PROJECT=accounts-site
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.accounts-site.rule=Host(`accounts.fbi.com`)
+      - traefik.http.routers.accounts-site.entrypoints=http
+      - traefik.http.services.accounts-site.loadbalancer.server.port=80
+    healthcheck:
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1']
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
