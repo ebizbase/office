@@ -5,7 +5,7 @@ import { TuiRoot } from '@taiga-ui/core';
 @Component({
   standalone: true,
   imports: [TuiRoot, RouterModule],
-  selector: 'home-root',
+  selector: 'app',
   template: `
     <tui-root>
       <router-outlet></router-outlet>

@@ -14,6 +14,9 @@
   "customizations": {
     "vscode": {
       "settings": {
+        "[latex]": {
+          "files.autoSave": "onFocusChange"
+        },
         "files.associations": {
           "*.json": "jsonc"
         },
@@ -47,7 +50,9 @@
         "github.vscode-github-actions",
         "redhat.vscode-yaml",
         "mads-hartmann.bash-ide-vscode",
-        "firsttris.vscode-jest-runner"
+        "firsttris.vscode-jest-runner",
+        "Angular.ng-template",
+        "mrmlnc.vscode-scss"
       ]
     }
   }

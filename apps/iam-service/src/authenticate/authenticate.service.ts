@@ -69,7 +69,7 @@ export class AuthenticateService {
     }
   }
 
-  async login({ email, otp }: ILoginRequest, headers: Dict<string>): Promise<ILoginResponse> {
+  async signIn({ email, otp }: ILoginRequest, headers: Dict<string>): Promise<ILoginResponse> {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {

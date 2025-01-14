@@ -12,10 +12,7 @@ export class User {
   firstName: string;
 
   @Prop()
-  middleName?: string;
-
-  @Prop({ required: true })
-  lastName: string;
+  lastName?: string;
 
   @Prop({ required: true })
   createdAt: Date;

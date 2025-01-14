@@ -14,7 +14,6 @@ export class MeService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      middleName: user.middleName,
     };
   }
 }

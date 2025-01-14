@@ -9,6 +9,7 @@ async function bootstrap() {
   const logger = new PinoLogger();
   const app = await NestFactory.create<NestFastifyApplication>(MainModule, new FastifyAdapter(), {
     logger,
+    cors: true,
   });
   await app.listen(port, bind);
   logger.log(`REST API PORT ${bind}:${port}`, 'Bootstrap');

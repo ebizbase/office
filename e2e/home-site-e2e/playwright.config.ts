@@ -8,7 +8,6 @@ const baseURL = process.env['BASE_URL'] || 'http://fbi.com';
  */
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
-  globalSetup: require.resolve('./global-setup'),
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL,

@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AccessTokenService } from '../../../../services/access-token.service';
 @Component({
-  selector: 'home-header',
+  selector: 'home-layout-main-header',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  providers: [AccessTokenService],
   template: `
     <header class="fixed w-full">
       <nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
@@ -116,4 +118,6 @@ import { RouterModule } from '@angular/router';
     </header>
   `,
 })
-export class HeaderComponent {}
+export class LayoutMainHeaderComponent {
+  constructor(public accessToken: AccessTokenService) {}
+}

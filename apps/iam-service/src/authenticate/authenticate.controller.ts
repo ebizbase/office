@@ -1,24 +1,12 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Logger,
-  Post,
-  Headers,
-  Get,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Logger, Post, Headers } from '@nestjs/common';
 import { AuthenticateService } from './authenticate.service';
 import {
-  IAccessTokenPayload,
   ILoginRequest,
   ILoginResponse,
   IRefreshRequest,
   IRegisterRequest,
 } from '@ebizbase/iam-interfaces';
 import { Dict } from '@ebizbase/common-types';
-import { AccessTokenGuard } from '../access-token/access-token.guard';
 
 @Controller('authenticate')
 export class AuthenticateController {
@@ -35,12 +23,12 @@ export class AuthenticateController {
 
   @Post('sign-in')
   @HttpCode(200)
-  async login(
+  async signIn(
     @Body() credential: ILoginRequest,
     @Headers() headers: Dict<string>
   ): Promise<ILoginResponse> {
     this.logger.debug({ msg: 'Signing in', credential });
-    return this.authenticateService.login(credential, headers);
+    return this.authenticateService.signIn(credential, headers);
   }
 
   @Post('refresh')
@@ -51,15 +39,5 @@ export class AuthenticateController {
   ): Promise<ILoginResponse> {
     this.logger.debug({ msg: 'Refresing access token', refreshTokenData });
     return await this.authenticateService.refresh(refreshTokenData, headers);
-  }
-
-  @Get('otp')
-  @HttpCode(200)
-  @UseGuards(AccessTokenGuard)
-  async sendNewOtp(
-    @Req() { accessTokenPayload }: { accessTokenPayload: IAccessTokenPayload }
-  ): Promise<void> {
-    this.logger.debug({ msg: 'Refresing access token', accessTokenPayload });
-    return this.authenticateService.sendNewOtp(accessTokenPayload);
   }
 }

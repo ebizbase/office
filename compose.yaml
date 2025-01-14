@@ -2,14 +2,13 @@ name: ebizbase
 services:
   traefik:
     image: 'traefik:v3.2@sha256:efb87236c8c92599bcd3a67a7a8a55e0f255665f4719722bf398935aa9b92270'
+    container_name: traefik
     command:
       - --log.level=DEBUG
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entryPoints.http.address=:80
-      - --entryPoints.amqp.address=:5672
-      - --entryPoints.mongo.address=:27017
     ports:
       - 80:80
     volumes:
@@ -20,8 +19,10 @@ services:
       - traefik.http.routers.traefik.service=traefik@docker
       - traefik.http.services.traefik.loadbalancer.server.port=8080
 
+
   mongodb:
     image: ghcr.io/ebizbase/mongodev:latest@sha256:067acd2559e8804320590478ec2b1b108acdd5f8c37e14fc17ff7e35b6cb2abc
+    container_name: mongodb
     ports:
       - 27017:27017
     labels:
@@ -38,6 +39,7 @@ services:
 
   redis:
     image: ghcr.io/ebizbase/redisdev:latest@sha256:71c75f02ae1d4e23d620ac2feae1e51b99945aba68077744956bb77a70166503
+    container_name: redis
     ports:
       - 6379:6379
     labels:
@@ -56,6 +58,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rabbitmq
+    container_name: rabbitmq
     ports:
       - 5672:5672
     labels:
@@ -72,6 +75,7 @@ services:
 
   mailhog:
     image: mailhog/mailhog@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
+    container_name: mailhog
     labels:
       - traefik.enable=true
       - traefik.http.routers.mailhog-admin.rule=Host(`mail.fbi.com`)
@@ -86,6 +90,7 @@ services:
 
   minio:
     image: quay.io/minio/minio@sha256:1dce27c494a16bae114774f1cec295493f3613142713130c2d22dd5696be6ad3
+    container_name: minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_PASSWORD: minioadmin
@@ -106,7 +111,12 @@ services:
       retries: 3
 
   mailer-service:
-    image: ebizbase/mailer-service:edge
+    build:
+      dockerfile: Dockerfile.service
+    container_name: mailer-service
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/apps/mailer-service
     environment:
       - MONGODB_URI=mongodb://mongodb:27017?directConnection=true
       - RABBITMQ_URIS=amqp://rabbitmq:5672
@@ -122,15 +132,22 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+      mailhog:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000/healthy/readiness']
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 30s
+      start_period: 10s
 
   iam-service:
-    image: ebizbase/iam-service:edge
+    build:
+      dockerfile: Dockerfile.service
+    container_name: iam-service
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/apps/iam-service
     environment:
       - TOKEN_SECRET=secret
       - ACCESS_TOKEN_EXPIRES=1s
@@ -144,9 +161,7 @@ services:
       - traefik.http.routers.iam-service.entrypoints=http
       - traefik.http.services.iam-service.loadbalancer.server.port=3000
     depends_on:
-      rabbitmq:
-        condition: service_healthy
-      mongodb:
+      mailer-service:
         condition: service_healthy
     healthcheck:
       test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000/healthy/readiness']
@@ -156,15 +171,23 @@ services:
       start_period: 30s
 
   home-site:
-    image: ebizbase/home-site:edge
+    build:
+      dockerfile: Dockerfile.site
+    container_name: home-site
+    volumes:
+      - .:/workspace
+      - ./.angular/deployment:/workspace/.angular
+      - ./dist/deployment:/workspace/dist
+    environment:
+      - PROJECT=home-site
     labels:
       - traefik.enable=true
       - traefik.http.routers.home-site.rule=Host(`fbi.com`)
       - traefik.http.routers.home-site.entrypoints=http
-      - traefik.http.services.home-site.loadbalancer.server.port=3000
+      - traefik.http.services.home-site.loadbalancer.server.port=80
     healthcheck:
-      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:3000']
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1']
       interval: 5s
       timeout: 5s
-      retries: 3
-      start_period: 10s
+      retries: 15
+      start_period: 30s

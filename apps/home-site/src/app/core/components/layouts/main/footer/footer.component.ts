@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 @Component({
-  selector: 'home-footer',
+  selector: 'home-layout-main-footer',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
@@ -203,4 +203,4 @@ import { RouterModule } from '@angular/router';
     </footer>
   `,
 })
-export class FooterComponent {}
+export class LayoutMainFooterComponent {}

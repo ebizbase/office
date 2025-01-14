@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import { ILoginResponse, IRegisterRequest } from '@ebizbase/iam-interfaces';
 import { MailHogTesting } from '@ebizbase/testing-utils';
 import axios from 'axios';
@@ -7,12 +8,10 @@ const BASE_URL = 'http://iam-service.fbi.com';
 
 export const createUserInfo: () => IRegisterRequest = () => {
   const firstName = uuidv1();
-  const middleName = uuidv1();
   const lastName = uuidv1();
   return {
-    email: `${firstName}${middleName}${lastName}@example.com`,
+    email: `${firstName}${lastName}@example.com`,
     firstName,
-    middleName,
     lastName,
   };
 };
@@ -23,8 +22,11 @@ export const createTenantInfo = () => {
   return { name, identify };
 };
 
-export const registerUser = async (userInfo: IRegisterRequest) => {
+export const registerUser = async (userInfo: IRegisterRequest, validateResponse = false) => {
   const response = await axios.post(`${BASE_URL}/authenticate/register`, userInfo);
+  if (validateResponse) {
+    expect(response.status).toBe(201);
+  }
   return response;
 };
 

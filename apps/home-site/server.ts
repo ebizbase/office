@@ -1,12 +1,10 @@
 import 'zone.js/node';
-
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import bootstrap from './src/main.server';
-import { REQUEST as SSR_REQUEST } from 'ngx-cookie-service-ssr';
 import { provideLocation, provideUserAgent } from '@ng-web-apis/universal';
 
 // The Express app is exported so that it can be used by serverless Functions.
@@ -50,8 +48,7 @@ export function app(): express.Express {
         publicPath: distFolder,
         providers: [
           { provide: APP_BASE_HREF, useValue: baseUrl },
-          { provide: 'HOSTNAME', useValue: host },
-          { provide: SSR_REQUEST, useValue: req },
+          { provide: 'REQUEST', useValue: req },
           { provide: 'RESPONSE', useValue: res },
           provideLocation(req),
           provideUserAgent(req),

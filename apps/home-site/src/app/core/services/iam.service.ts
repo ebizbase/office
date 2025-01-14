@@ -1,7 +1,10 @@
-import { Inject, Injectable } from '@angular/core';
+import { ILoginRequest, ILoginResponse, IRegisterRequest } from '@ebizbase/iam-interfaces';
+import { Injectable } from '@angular/core';
 import { IRestfulResponse } from '@ebizbase/common-types';
-import { WA_LOCATION } from '@ng-web-apis/common';
-import { from, Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { DomainService } from './host.service';
+import { AccessTokenService } from './access-token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,22 +12,24 @@ import { from, Observable } from 'rxjs';
 export class IamService {
   private readonly baseURL: string;
 
-  constructor(@Inject(WA_LOCATION) private location: Location) {
-    let host = this.location.host;
-    if (host.startsWith('127.0.0.1') || host.startsWith('localhost')) {
-      host = 'fbi.com';
-    }
-    this.baseURL = this.location.protocol + '//iam-service.' + host;
-    console.log('iam-service', { baseURL: this.baseURL });
+  constructor(
+    private domain: DomainService,
+    private accessToken: AccessTokenService,
+    private http: HttpClient
+  ) {
+    this.baseURL = this.domain.protocol + '//iam-service.' + this.domain.rootDomain;
   }
 
-  identify(email: string): Observable<IRestfulResponse> {
-    console.log('indentify', { email });
-    return from([]);
+  register(data: IRegisterRequest): Observable<IRestfulResponse> {
+    return this.http.post<IRestfulResponse>(`${this.baseURL}/authenticate/register`, data).pipe();
   }
 
-  verify(email: string, otp: string): Observable<IRestfulResponse> {
-    console.log('verify', { email, otp });
-    return from([]);
+  signIn(data: ILoginRequest): Observable<ILoginResponse> {
+    return this.http.post<ILoginResponse>(`${this.baseURL}/authenticate/sign-in`, data).pipe(
+      tap(({ accessToken, refreshToken }) => {
+        console.log(accessToken, refreshToken);
+        this.accessToken.setTokens(accessToken, refreshToken);
+      })
+    );
   }
 }
