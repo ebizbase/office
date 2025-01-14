@@ -47,6 +47,7 @@ export function app(): express.Express {
         url: `${protocol}://${host}${originalUrl}`,
         publicPath: distFolder,
         providers: [
+          { provide: 'DOMAIN', useValue: process.env['DOMAIN'] },
           { provide: APP_BASE_HREF, useValue: baseUrl },
           { provide: 'REQUEST', useValue: req },
           { provide: 'RESPONSE', useValue: res },

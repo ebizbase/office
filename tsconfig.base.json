@@ -29,6 +29,7 @@
     "baseUrl": ".",
     "paths": {
       "@ebizbase/angular-common-ui": ["libs/angular/angular-common-ui/src/index.ts"],
+      "@ebizbase/angular-domain-service": ["libs/angular/angular-domain-service/src/index.ts"],
       "@ebizbase/common-types": ["libs/common/common-types/src/index.ts"],
       "@ebizbase/iam-interfaces": ["libs/common/iam-interfaces/src/index.ts"],
       "@ebizbase/mail-interfaces": ["libs/common/mail-interfaces/src/index.ts"],
