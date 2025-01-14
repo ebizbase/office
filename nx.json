@@ -88,14 +88,19 @@
   },
   "generators": {
     "@nx/angular:application": {
-      "e2eTestRunner": "playwright",
+      "e2eTestRunner": "none",
       "linter": "eslint",
       "style": "scss",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "bundler": "webpack",
+      "addTailwind": true,
+      "prefix": "",
+      "tags": "sites"
     },
     "@nx/angular:library": {
       "linter": "eslint",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "prefix": ""
     },
     "@nx/angular:component": {
       "style": "css"
