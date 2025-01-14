@@ -8,7 +8,7 @@ import {
 import { IamService } from '../../core/services/iam.service';
 
 @Component({
-  selector: 'sign-in-verify-otp',
+  selector: 'app-sign-in-verify-otp',
   standalone: true,
   imports: [CommonModule, RouterModule, SignInFormComponent],
   providers: [IamService],
@@ -21,7 +21,7 @@ import { IamService } from '../../core/services/iam.service';
         <h2 class="md:text-lg leading-tight w-full">Enter your name</h2>
       </div>
       <div class="w-full py-4">
-        <sign-in-form [isLoading]="isLoading" (formSubmit)="formSubmitted($event)" />
+        <app-sign-in-form [isLoading]="isLoading" (formSubmit)="formSubmitted($event)" />
       </div>
     </div>
   `,

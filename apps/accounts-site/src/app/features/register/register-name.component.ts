@@ -7,7 +7,7 @@ import {
 } from '../../core/components/forms/register/register-name.component';
 
 @Component({
-  selector: 'register-name',
+  selector: 'app-register-name',
   standalone: true,
   imports: [CommonModule, RouterModule, RegisterNameFormComponent],
   template: `
@@ -19,7 +19,7 @@ import {
         <h2 class="md:text-lg leading-tight w-full">Enter your name</h2>
       </div>
       <div class="w-full py-4">
-        <register-name-form
+        <app-register-name-form
           [initiateFirstName]="initiateFirstName"
           [initiateLastName]="initiateLastName"
           [isLoading]="isLoading"

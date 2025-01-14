@@ -17,7 +17,7 @@ export interface SignInFormSubmitEvent {
 }
 
 @Component({
-  selector: 'sign-in-form',
+  selector: 'app-sign-in-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -54,13 +54,13 @@ export interface SignInFormSubmitEvent {
         />
       </tui-textfield>
       <div class="flex gap-2 justify-end mt-8 ">
-        <home-loader-button
+        <app-loader-button
           (click)="onSubmitEvent()"
           [isDisabled]="!form.valid"
           [isLoading]="isLoading"
         >
           {{ labels.submitButton }}
-        </home-loader-button>
+        </app-loader-button>
       </div>
     </form>
   `,

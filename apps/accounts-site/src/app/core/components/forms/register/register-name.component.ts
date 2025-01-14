@@ -25,7 +25,7 @@ export interface RegisterNameFormSubmmittedEvent {
 }
 
 @Component({
-  selector: 'register-name-form',
+  selector: 'app-register-name-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -47,13 +47,13 @@ export interface RegisterNameFormSubmmittedEvent {
         <input tuiTextfield formControlName="lastName" [invalid]="isControlInvalid('lastName')" />
       </tui-textfield>
       <div class="flex gap-2 justify-end pt-8">
-        <home-loader-button
+        <app-loader-button
           (click)="onSubmitEvent()"
           [isDisabled]="!form.valid"
           [isLoading]="isLoading"
         >
           {{ labels.submitButton }}
-        </home-loader-button>
+        </app-loader-button>
       </div>
     </form>
   `,

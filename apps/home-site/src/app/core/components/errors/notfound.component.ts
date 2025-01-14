@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'home-not-found-error',
+  selector: 'app-not-found-error',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `

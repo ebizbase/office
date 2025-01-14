@@ -8,7 +8,7 @@ import {
 import { IamService } from '../../core/services/iam.service';
 
 @Component({
-  selector: 'register-email',
+  selector: 'app-register-email',
   standalone: true,
   imports: [CommonModule, RouterModule, RegisterEmailFormComponent],
   template: `
@@ -20,7 +20,7 @@ import { IamService } from '../../core/services/iam.service';
         <h2 class="md:text-lg leading-tight w-full">Enter your email</h2>
       </div>
       <div class="w-full py-4">
-        <register-email-form [isLoading]="isLoading" (formSubmit)="formSubmitted($event)" />
+        <app-register-email-form [isLoading]="isLoading" (formSubmit)="formSubmitted($event)" />
       </div>
     </div>
   `,

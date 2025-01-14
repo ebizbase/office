@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AccessTokenService } from '../../../../services/access-token.service';
 @Component({
-  selector: 'home-layout-main-header',
+  selector: 'app-layout-main-header',
   standalone: true,
   imports: [CommonModule, RouterModule],
   providers: [AccessTokenService],

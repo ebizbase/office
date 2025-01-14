@@ -4,13 +4,13 @@ import { RouterModule } from '@angular/router';
 import { LayoutMainHeaderComponent } from './header/header.component';
 import { LayoutMainFooterComponent } from './footer/footer.component';
 @Component({
-  selector: 'home-layout-main',
+  selector: 'app-layout-main',
   standalone: true,
   imports: [CommonModule, RouterModule, LayoutMainHeaderComponent, LayoutMainFooterComponent],
   template: `
-    <home-layout-main-header />
+    <app-layout-main-header />
     <router-outlet></router-outlet>
-    <home-layout-main-footer />
+    <app-layout-main-footer />
   `,
 })
 export class LayoutMainComponent {}
