@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AuthenticateService, DomainService } from '@ebizbase/angular-common-service';
+import { WA_WINDOW } from '@ng-web-apis/common';
 import { TuiRoot } from '@taiga-ui/core';
 
 @Component({
@@ -17,4 +19,19 @@ import { TuiRoot } from '@taiga-ui/core';
     </tui-root>
   `,
 })
-export class AppComponent {}
+export class AppComponent implements OnInit {
+
+
+  constructor(
+    private domain: DomainService,
+    private authenticate: AuthenticateService,
+    @Inject(WA_WINDOW) private window: Window,
+  ) { }
+
+  ngOnInit(): void {
+    if (!this.authenticate.isLoggedIn) {
+      this.window.location.href = `${this.domain.AccountsSiteDomain}/identify?continue=${this.domain.MyAccountSiteDomain}`;
+    }
+  }
+
+}

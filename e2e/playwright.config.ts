@@ -1,15 +1,57 @@
 import { defineConfig, devices } from '@playwright/test';
-import { nxE2EPreset } from '@nx/playwright/preset';
+import { workspaceRoot } from '@nx/devkit';
+import { isUsingTsSolutionSetup } from '@nx/js/src/utils/typescript/ts-solution-setup';
+import { defineBddConfig } from 'playwright-bdd';
+import { relative, join } from 'path';
+
+const projectPath = relative(workspaceRoot, __dirname);
+const offset = relative(__dirname, workspaceRoot);
+
+const isTsSolutionSetup = isUsingTsSolutionSetup();
+
+const testResultOuputDir = isTsSolutionSetup
+  ? 'test-output/playwright/output'
+  : join(offset, 'dist', '.playwright', projectPath, 'test-output');
+const reporterOutputDir = isTsSolutionSetup
+  ? 'test-output/playwright/report'
+  : join(offset, 'dist', '.playwright', projectPath, 'playwright-report');
+
+const testDir = defineBddConfig({
+  features: './src/features',
+  steps: './src/steps/**/*.ts',
+  verbose: true,
+});
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  ...nxE2EPreset(__filename, { testDir: './src' }),
+  testDir,
+  outputDir: testResultOuputDir,
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env['CI'],
+  /* Retry on CI only */
+  retries: process.env['CI'] ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env['CI'] ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [
+    [
+      'html',
+      {
+        outputFolder: reporterOutputDir,
+        open: process.env['CI'] ? 'never' : 'on-failure',
+      },
+    ],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    video: {
+      mode: 'retain-on-failure',
+      size: { width: 640, height: 480 },
+    },
   },
   projects: [
     {

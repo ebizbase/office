@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "target": "ES2022",
     "lib": ["es2022", "dom"],
-    "types": ["node", "jest"],
+    "types": ["node"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",

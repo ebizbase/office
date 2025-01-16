@@ -11,7 +11,6 @@ import { IRestfulResponse } from '@ebizbase/common-types';
 })
 export class IamService {
   private readonly accessTokenKey = 'actk';
-
   private readonly refreshTokenKey = 'rftk';
 
   private isLoggedIn$: BehaviorSubject<boolean>;

@@ -2,7 +2,7 @@ name: ebizbase
 
 x-common-config: &common
   healthcheck:
-    interval: 10s
+    interval: 5s
     timeout: 5s
 
 x-infras-config: &infras
@@ -15,8 +15,7 @@ x-apps-config: &apps
   <<: *common
   env_file: .env
   healthcheck:
-    start_period: 30s
-    retries: 10
+    start_period: 10s
 
 x-services-config: &services
   <<: *apps

@@ -36,12 +36,6 @@
       "options": {
         "targetName": "automate"
       }
-    },
-    {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "automate"
-      }
     }
   ],
   "targetDefaults": {
@@ -80,10 +74,6 @@
     "@angular-devkit/build-angular:browser": {
       "cache": true,
       "inputs": ["production", "^production"]
-    },
-    "automate": {
-      "inputs": ["production", "^production"],
-      "cache": true
     }
   },
   "generators": {

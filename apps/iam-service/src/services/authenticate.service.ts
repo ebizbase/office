@@ -1,5 +1,7 @@
-import speakeasy from 'speakeasy';
-import ms from 'ms';
+import { Dict, IRestfulResponse } from '@ebizbase/common-types';
+import { ILoginRequest, ILoginResponseData } from '@ebizbase/iam-interfaces';
+import { ITransactionalMail } from '@ebizbase/mail-interfaces';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import {
   BadRequestException,
   Injectable,
@@ -7,14 +9,12 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Dict, IRestfulResponse } from '@ebizbase/common-types';
-import { ILoginRequest, ILoginResponseData } from '@ebizbase/iam-interfaces';
-import { HOTP } from '../schemas/hotp';
 import { JwtService } from '@nestjs/jwt';
+import ms from 'ms';
+import speakeasy from 'speakeasy';
+import { HOTP } from '../schemas/hotp';
 import { InjectSessionModel, SessionModel } from '../schemas/session.schema';
 import { InjectUserModel, UserModel } from '../schemas/user.schema';
-import { ITransactionalMail } from '@ebizbase/mail-interfaces';
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 
 @Injectable()
 export class AuthenticateService {
@@ -28,7 +28,7 @@ export class AuthenticateService {
     private readonly jwtService: JwtService,
     @InjectSessionModel() private sessionModel: SessionModel,
     @InjectUserModel() private userModel: UserModel
-  ) {}
+  ) { }
 
   async identify(email: string): Promise<IRestfulResponse> {
     this.logger.debug({ msg: 'Identify', email });
@@ -99,8 +99,8 @@ export class AuthenticateService {
     if (!userAgent) {
       throw new UnauthorizedException('User-Agent header is missing');
     } else if (!ipAddress) {
-      this.logger.error({ msg: "Can't extract user remote ip from headers", headers });
-      throw new InternalServerErrorException("Can't get user remote ip");
+      this.logger.error({ msg: 'Can not extract user remote ip from headers', headers });
+      throw new InternalServerErrorException('Can not get user remote ip');
     }
 
     const now = Date.now();
