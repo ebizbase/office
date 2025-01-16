@@ -28,8 +28,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ebizbase/angular-common-ui": ["libs/angular/angular-common-ui/src/index.ts"],
       "@ebizbase/angular-common-service": ["libs/angular/angular-common-service/src/index.ts"],
+      "@ebizbase/angular-common-ui": ["libs/angular/angular-common-ui/src/index.ts"],
       "@ebizbase/common-types": ["libs/common/common-types/src/index.ts"],
       "@ebizbase/iam-interfaces": ["libs/common/iam-interfaces/src/index.ts"],
       "@ebizbase/mail-interfaces": ["libs/common/mail-interfaces/src/index.ts"],
