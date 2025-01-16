@@ -1,6 +1,6 @@
-export interface ILoginResponse {
+export interface ILoginResponseData {
   accessToken: string;
   accessTokenExpiresAt: number;
   refreshToken: string;
-  onboardedAt?: Date;
+  refreshTokenExpiresAt: number;
 }

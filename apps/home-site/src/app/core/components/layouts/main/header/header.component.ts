@@ -1,22 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { AccessTokenService } from '../../../../services/access-token.service';
+import { FullColorLogoComponent } from '@ebizbase/angular-common-ui';
 @Component({
   selector: 'app-layout-main-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  providers: [AccessTokenService],
+  imports: [CommonModule, FullColorLogoComponent],
+  providers: [],
   template: `
     <header class="fixed w-full">
       <nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
         <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
           <a href="#" class="flex items-center">
-            <img
-              src="./logo/digital/full_color/full-color-logo.svg"
-              class="h-6 mr-3 sm:h-9"
-              alt="Landwind Logo"
-            />
+            <cmui-full-color-logo />
           </a>
           <div class="flex items-center lg:order-2">
             <a
@@ -118,6 +113,4 @@ import { AccessTokenService } from '../../../../services/access-token.service';
     </header>
   `,
 })
-export class LayoutMainHeaderComponent {
-  constructor(public accessToken: AccessTokenService) {}
-}
+export class LayoutMainHeaderComponent {}

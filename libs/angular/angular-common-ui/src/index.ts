@@ -1,1 +1,2 @@
-export * from './lib/angular-common-ui/angular-common-ui.component';
+export * from './lib/buttons/loader.component';
+export * from './lib/logo/full-color.component';

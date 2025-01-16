@@ -2,18 +2,23 @@ import { NodeMailerModule } from '@ebizbase/nestjs-node-mailer';
 import { RabbitModule } from '@ebizbase/nestjs-rabbit';
 import { MongoModule } from '@ebizbase/nestjs-mongo';
 import { Module } from '@nestjs/common';
-import { HealthyModule } from './healthy/healthy.module';
-import { UserModule } from './user/user.module';
-import { AuthenticateModule } from './authenticate/authenticate.module';
-import { UserSessionModule } from './user-session/user-session.module';
-import { TenantModule } from './tenant/tenant.module';
-import { AccessTokenModule } from './access-token/access-token.module';
-import { MeModule } from './me/me.module';
-import { MailerModule } from './mailer/mailer.module';
+import { HealthyController } from './controllers/healthy.controller';
+import { HealthyService } from './services/healthy.service';
+import { AuthenticateService } from './services/authenticate.service';
+import { AuthenticateController } from './controllers/authenticate.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './schemas/user.schema';
+import { Session } from 'inspector/promises';
+import { SessionSchema } from './schemas/session.schema';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     MongoModule.register('iam-service'),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Session.name, schema: SessionSchema },
+    ]),
     NodeMailerModule.register(),
     RabbitModule.register({
       exchanges: [
@@ -25,14 +30,20 @@ import { MailerModule } from './mailer/mailer.module';
         },
       ],
     }),
-    HealthyModule,
-    AccessTokenModule,
-    AuthenticateModule,
-    MeModule,
-    MailerModule,
-    UserModule,
-    TenantModule,
-    UserSessionModule,
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: () => {
+        const secret = process.env['TOKEN_SECRET'];
+        if (!secret) {
+          throw new Error('Missing TOKEN_SECRET environment variable');
+        }
+        return {
+          secret: process.env['TOKEN_SECRET'],
+        };
+      },
+    }),
   ],
+  controllers: [HealthyController, AuthenticateController],
+  providers: [HealthyService, AuthenticateService],
 })
 export class MainModule {}

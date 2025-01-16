@@ -21,7 +21,7 @@ x-apps-config: &apps
 x-services-config: &services
   <<: *apps
   build:
-      dockerfile: Dockerfile.service
+    dockerfile: Dockerfile.service
   volumes:
     - .:/workspace
   healthcheck:
@@ -30,7 +30,7 @@ x-services-config: &services
 x-sites-config: &sites
   <<: *apps
   build:
-      dockerfile: Dockerfile.site
+    dockerfile: Dockerfile.site
   volumes:
     - .:/workspace
     - ./.angular/deployment:/workspace/.angular
@@ -38,10 +38,7 @@ x-sites-config: &sites
   healthcheck:
     test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1']
 
-
-
 services:
-
   traefik:
     <<: *infras
     image: 'traefik:v3.2@sha256:efb87236c8c92599bcd3a67a7a8a55e0f255665f4719722bf398935aa9b92270'
@@ -64,7 +61,6 @@ services:
     healthcheck:
       test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:8080']
 
-
   mongodb:
     <<: *infras
     build: ./infras/mongodb
@@ -76,8 +72,7 @@ services:
       - traefik.http.routers.mongodb-admin.entrypoints=http
       - traefik.http.services.mongodb-admin.loadbalancer.server.port=8081
     healthcheck:
-      test: ['CMD', '/usr/bin/wget', '--spider', '-q',  "http://127.0.0.1:8081"]
-
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1:8081']
 
   redis:
     <<: *infras
@@ -104,7 +99,7 @@ services:
       - traefik.http.routers.rabbitmq-admin.entrypoints=http
       - traefik.http.services.rabbitmq-admin.loadbalancer.server.port=15672
     healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', '-q',  'ping']
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
 
   mailhog:
     <<: *infras
@@ -116,7 +111,6 @@ services:
       - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
     healthcheck:
       test: wget --spider -q http://localhost:8025
-
 
   minio:
     <<: *infras
@@ -132,7 +126,6 @@ services:
       - traefik.http.services.minio.loadbalancer.server.port=9000
     healthcheck:
       test: ['CMD', 'mc', 'ready', 'local']
-
 
   mailer-service:
     <<: *services
@@ -150,6 +143,19 @@ services:
       mailhog:
         condition: service_healthy
 
+  static-assets:
+    <<: *apps
+    image: flashspys/nginx-static
+    container_name: static-assets
+    volumes:
+      - ./apps/static-assets/public:/static
+      - ./node_modules/@taiga-ui/icons/src:/static/icons
+    labels:
+      - traefik.http.routers.static-assets.rule=Host(`static-assets.fbi.com`)
+      - traefik.http.routers.static-assets.entrypoints=http
+      - traefik.http.services.static-assets.loadbalancer.server.port=80
+    healthcheck:
+      test: ['CMD', '/usr/bin/wget', '--spider', '-q', 'http://127.0.0.1/favicon.ico']
 
   iam-service:
     <<: *services
