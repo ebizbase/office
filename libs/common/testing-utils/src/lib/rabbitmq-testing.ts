@@ -1,6 +1,6 @@
 import * as amqp from 'amqplib';
 
-export interface RabbitMQClient {
+export interface RabbitMQTEstingClient {
   connection: amqp.Connection;
   chanel: amqp.Channel;
   close: () => Promise<void>;
@@ -12,7 +12,7 @@ export class RabbitMQTesting {
     private port = 5672
   ) {}
 
-  public async getClient(): Promise<RabbitMQClient> {
+  public async getClient(): Promise<RabbitMQTEstingClient> {
     try {
       const connection = await amqp.connect({
         protocol: 'amqp',

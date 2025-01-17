@@ -1,9 +1,15 @@
-import { Inject, Injectable, makeStateKey, Optional, PLATFORM_ID, TransferState } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
+import {
+  Inject,
+  Injectable,
+  makeStateKey,
+  Optional,
+  PLATFORM_ID,
+  TransferState,
+} from '@angular/core';
 import { WA_LOCATION } from '@ng-web-apis/common';
 
 const domainStateKey = makeStateKey<string>('DOMAIN');
-
 
 @Injectable({ providedIn: 'root' })
 export class DomainService {
@@ -12,13 +18,17 @@ export class DomainService {
   public readonly MyAccountSiteDomain: string;
   public readonly AccountsSiteDomain: string;
   public readonly IamServiceDomain: string;
-  public readonly StaticAssetDomain: string;
+  public readonly StaticAssetsDomain: string;
+  public readonly IamServiceBaseURL: string;
+  public readonly StaticAssetsBaseURL: string;
+  public readonly AccountsSiteBaseURL: string;
+  public readonly MyAccountBaseURL: string;
 
   constructor(
     private transferState: TransferState,
     @Inject(WA_LOCATION) private location: Location,
     @Inject(PLATFORM_ID) private platformId: object,
-    @Optional() @Inject('DOMAIN') private domainEnviroment: string,
+    @Optional() @Inject('DOMAIN') private domainEnviroment: string
   ) {
     if (isPlatformServer(this.platformId)) {
       this.RootDomain = this.domainEnviroment;
@@ -26,11 +36,18 @@ export class DomainService {
     } else {
       this.RootDomain = this.transferState.get(domainStateKey, '');
     }
+    console.debug('Root Domain', this.RootDomain);
     this.Protocol = this.location.protocol;
-    this.IamServiceDomain = this.Protocol + '//iam-service.' + this.RootDomain;
-    this.StaticAssetDomain = this.Protocol + '//static-assets.' + this.RootDomain;
-    this.AccountsSiteDomain = this.Protocol + '//accounts.' + this.RootDomain;
-    this.MyAccountSiteDomain = this.Protocol + '//my-account.' + this.RootDomain;
+    this.IamServiceDomain = 'iam-service.' + this.RootDomain;
+    this.IamServiceBaseURL = this.Protocol + '//' + this.IamServiceDomain;
 
+    this.StaticAssetsDomain = 'static-assets.' + this.RootDomain;
+    this.StaticAssetsBaseURL = this.Protocol + '//' + this.StaticAssetsDomain;
+
+    this.AccountsSiteDomain = 'accounts.' + this.RootDomain;
+    this.AccountsSiteBaseURL = this.Protocol + '//' + this.AccountsSiteDomain;
+
+    this.MyAccountSiteDomain = 'my-account.' + this.RootDomain;
+    this.MyAccountBaseURL = this.Protocol + '//' + this.MyAccountSiteDomain;
   }
 }

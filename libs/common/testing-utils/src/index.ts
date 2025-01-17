@@ -1,3 +1,3 @@
-export * from './lib/mailhog-testing';
-export * from './lib/rabbitmq-testing';
+export * from './lib/mail-testing';
 export * from './lib/mongodb-testing';
+export * from './lib/rabbitmq-testing';

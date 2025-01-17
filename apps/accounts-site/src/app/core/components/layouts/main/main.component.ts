@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
     <div class="bg-gray-50 font-[sans-serif] text-[#333]">
       <div class="min-h-screen flex flex-col items-center justify-center py-6 px-4">
         <main
-          class="max-w-4xl w-full border py-12 px-6 rounded-3xl border-gray-300 bg-white min-h-80"
+          class="max-w-4xl w-full py-12 px-6 md:border md:rounded-3xl md:border-gray-300 md:bg-white md:min-h-80"
         >
           <router-outlet></router-outlet>
         </main>

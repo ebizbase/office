@@ -1,8 +1,8 @@
-import { defineConfig, devices } from '@playwright/test';
 import { workspaceRoot } from '@nx/devkit';
 import { isUsingTsSolutionSetup } from '@nx/js/src/utils/typescript/ts-solution-setup';
+import { defineConfig, devices } from '@playwright/test';
+import { join, relative } from 'path';
 import { defineBddConfig } from 'playwright-bdd';
-import { relative, join } from 'path';
 
 const projectPath = relative(workspaceRoot, __dirname);
 const offset = relative(__dirname, workspaceRoot);
@@ -17,8 +17,8 @@ const reporterOutputDir = isTsSolutionSetup
   : join(offset, 'dist', '.playwright', projectPath, 'playwright-report');
 
 const testDir = defineBddConfig({
-  features: './src/features',
-  steps: './src/steps/**/*.ts',
+  features: './src/',
+  steps: './src/**/*.ts',
   verbose: true,
 });
 
@@ -42,14 +42,18 @@ export default defineConfig({
       'html',
       {
         outputFolder: reporterOutputDir,
-        open: process.env['CI'] ? 'never' : 'on-failure',
+        open: !process.env['CI'] ? (process.env['CIDEV'] ? 'always' : 'on-failure') : 'never',
       },
     ],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     video: {
-      mode: 'retain-on-failure',
+      mode: !process.env['CI']
+        ? process.env['CIDEV']
+          ? 'on'
+          : 'retain-on-failure'
+        : 'retain-on-failure',
       size: { width: 640, height: 480 },
     },
   },

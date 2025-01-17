@@ -1,5 +1,4 @@
 import { Dict, IRestfulResponse } from '@ebizbase/common-types';
-import { ILoginRequest, ILoginResponseData } from '@ebizbase/iam-interfaces';
 import { ITransactionalMail } from '@ebizbase/mail-interfaces';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import {
@@ -12,9 +11,13 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import ms from 'ms';
 import speakeasy from 'speakeasy';
-import { HOTP } from '../schemas/hotp';
+import { GetOtpInputDTO } from '../dtos/get-otp-input.dto';
+import { IdentifyInputDTO } from '../dtos/identify-input.dto';
+import { IdentifyOutputDTO } from '../dtos/identify-output.dto';
+import { VerifyInputDTO } from '../dtos/verify-input.dto';
+import { VerifyOutputDTO } from '../dtos/verify-output.dto';
 import { InjectSessionModel, SessionModel } from '../schemas/session.schema';
-import { InjectUserModel, UserModel } from '../schemas/user.schema';
+import { InjectUserModel, UserDocument, UserModel } from '../schemas/user.schema';
 
 @Injectable()
 export class AuthenticateService {
@@ -28,64 +31,90 @@ export class AuthenticateService {
     private readonly jwtService: JwtService,
     @InjectSessionModel() private sessionModel: SessionModel,
     @InjectUserModel() private userModel: UserModel
-  ) { }
+  ) {}
 
-  async identify(email: string): Promise<IRestfulResponse> {
+  async identify({ email }: IdentifyInputDTO): Promise<IRestfulResponse<IdentifyOutputDTO>> {
     this.logger.debug({ msg: 'Identify', email });
     let user = await this.userModel.findOne({ email });
     if (!user) {
       user = await this.userModel.create({ email });
-    } else {
-      user = await this.userModel.findOneAndUpdate(
-        { _id: user._id },
-        {
-          $inc: { 'hotp.counter': 1 },
-          $set: { 'hotp.used': false },
-          $currentDate: { 'hotp.lastIssueAt': true },
-        },
-        {
-          new: true,
-        }
-      );
     }
-    const { secret, counter } = user.hotp;
-    const otp = speakeasy.hotp({ secret, counter });
-    await this.sendOtpEmail(user.email, otp);
     return {
       data: { firstName: user.firstName, lastName: user.lastName },
     };
   }
 
-  async verify(
-    { email, otp }: ILoginRequest,
-    headers: Dict<string>
-  ): Promise<IRestfulResponse<ILoginResponseData>> {
-    const user = await this.userModel.findOne({ email });
+  async getOTP({ email }: GetOtpInputDTO): Promise<IRestfulResponse> {
+    let user = await this.userModel.findOne({ email });
     if (!user) {
-      this.logger.debug(`User with email ${email} not found`);
-      throw new BadRequestException({
-        message: 'Incorrect email',
-      });
+      throw new BadRequestException({ message: 'Email is invalid' });
     }
-    if (!(await this.verifyHOTP(user.hotp, otp))) {
+
+    this.logger.debug({
+      shouldGenerateNewOtp:
+        user.otpCounter === 0 ||
+        user.otpUsed ||
+        Date.now() - user.otpIssuedAt.getTime() > 2 * 60 * 10000,
+      isFirstOtp: user.otpCounter === 0,
+      otpUsed: user.otpUsed,
+      over2MinFromLastIssue: Date.now() - user.otpIssuedAt.getTime() > 2 * 60 * 10000,
+    });
+    if (
+      user.otpCounter === 0 ||
+      user.otpUsed ||
+      Date.now() - user.otpIssuedAt.getTime() > 2 * 60 * 10000
+    ) {
+      user = await this.userModel.findOneAndUpdate(
+        { _id: user._id },
+        {
+          otpCounter: user.otpCounter + 1,
+          otpUsed: false,
+          otpIssuedAt: new Date(),
+        },
+        {
+          new: true,
+        }
+      );
+      const otp = speakeasy.hotp({ secret: user.otpSecret, counter: user.otpCounter });
+      await this.sendOtpEmail(user.email, otp);
+    }
+    return {};
+  }
+
+  async verify(
+    { email, otp }: VerifyInputDTO,
+    headers: Dict<string>
+  ): Promise<IRestfulResponse<VerifyOutputDTO>> {
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) {
+      this.logger.warn({ msg: 'Verify user with email not found', email });
+      throw new BadRequestException({ message: 'Incorrect email' });
+    }
+
+    if (!(await this.verifyHOTP(user, otp))) {
       this.logger.debug(`Invalid OTP for user with email ${email}`);
-      throw new BadRequestException({
-        message: 'Invalid OTP or expired',
-      });
+      throw new BadRequestException({ message: 'Invalid OTP or expired' });
     }
+    await this.userModel.findOneAndUpdate({ _id: user._id }, { otpUsed: true });
     return { data: await this.issueNewToken(user.id, headers) };
   }
 
-  async verifyHOTP({ secret, counter, issueAt }: HOTP, token: string): Promise<boolean> {
-    this.logger.debug({ msg: 'Verifying HOTP', secret, counter, token, issueAt });
+  async verifyHOTP(user: UserDocument, token: string): Promise<boolean> {
+    this.logger.debug({ msg: 'Verifying HOTP', user, token });
 
-    if (!speakeasy.hotp.verify({ secret, counter, token })) {
-      this.logger.debug('otp is invalid');
+    if (user.otpUsed) {
+      this.logger.debug('OTP is ussed');
       return false;
     }
 
-    if (new Date().getTime() - issueAt.getTime() > this.OTP_EXPIRES_IN) {
-      this.logger.debug('otp expired');
+    if (Date.now() - user.otpIssuedAt.getTime() > this.OTP_EXPIRES_IN) {
+      this.logger.debug('OTP expired');
+      return false;
+    }
+
+    if (!speakeasy.hotp.verify({ secret: user.otpSecret, counter: user.otpCounter, token })) {
+      this.logger.debug('OTP is invalid');
       return false;
     }
 
@@ -104,15 +133,16 @@ export class AuthenticateService {
     }
 
     const now = Date.now();
-    const accessTokenExpiresAt = now + ms(this.ACCESS_TOKEN_EXPIRES_IN);
-    const refreshTokenExpiresAt = now + ms(this.REFRESH_TOKEN_EXPIRES_IN);
+    const accessTokenExpiresAt = new Date(now + ms(this.ACCESS_TOKEN_EXPIRES_IN));
+    const refreshTokenExpiresAt = new Date(now + ms(this.REFRESH_TOKEN_EXPIRES_IN));
 
     const session = await this.sessionModel.create({
       userId,
       userAgent,
       ipAddress,
-      expiredAt: new Date(refreshTokenExpiresAt),
+      expiredAt: refreshTokenExpiresAt,
     });
+
     const accessToken = await this.jwtService.signAsync(
       { userId },
       { expiresIn: this.ACCESS_TOKEN_EXPIRES_IN }

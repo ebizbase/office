@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { IamService } from '../core/services/iam.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import {
   IdentifyFormComponent,
   IdentifyFormSubmmittedEvent,
 } from '../core/components/forms/identify.component';
+import { IamService } from '../core/services/iam.service';
 
 @Component({
   selector: 'app-identify-page',
@@ -36,7 +36,7 @@ export class IdentifyPageComponent {
 
   async formSubmitted({ email }: IdentifyFormSubmmittedEvent) {
     this.isLoading = true;
-    this.iam.identify(email).subscribe({
+    this.iam.identify({ email }).subscribe({
       next: ({ data }) => {
         this.router.navigate(['verify-otp'], {
           queryParams: { email, ...data },

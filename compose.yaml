@@ -16,6 +16,7 @@ x-apps-config: &apps
   env_file: .env
   healthcheck:
     start_period: 10s
+    retries: 100
 
 x-services-config: &services
   <<: *apps
@@ -100,16 +101,16 @@ services:
     healthcheck:
       test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
 
-  mailhog:
+  maildev:
     <<: *infras
-    build: infras/mailhog
-    container_name: mailhog
+    build: infras/maildev
+    container_name: maildev
     labels:
-      - traefik.http.routers.mailhog-admin.rule=Host(`mail.fbi.com`)
-      - traefik.http.routers.mailhog-admin.entrypoints=http
-      - traefik.http.services.mailhog-admin.loadbalancer.server.port=8025
+      - traefik.http.routers.maildev-admin.rule=Host(`mail.fbi.com`)
+      - traefik.http.routers.maildev-admin.entrypoints=http
+      - traefik.http.services.maildev-admin.loadbalancer.server.port=1080
     healthcheck:
-      test: wget --spider -q http://localhost:8025
+      test: wget --spider -q http://localhost:1080/healthz
 
   minio:
     <<: *infras
@@ -139,7 +140,7 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-      mailhog:
+      maildev:
         condition: service_healthy
 
   static-assets:

@@ -6,11 +6,6 @@ export const appRoutes: Route[] = [
     component: MainLayoutComponent,
     children: [
       {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: '/identify',
-      },
-      {
         path: 'identify',
         loadComponent: () =>
           import('./pages/identify.component').then((c) => c.IdentifyPageComponent),

@@ -1,4 +1,4 @@
-export interface ILoginRequest {
+export interface IVerifyRequest {
   email: string;
   otp: string;
 }

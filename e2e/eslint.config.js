@@ -9,10 +9,6 @@ module.exports = [
   },
   {
     files: ['**/*.ts', '**/*.js'],
-    rules: {},
-  },
-  {
-    files: ['src/steps/**/*.ts', 'src/**/*.js'],
     rules: {
       'playwright/no-standalone-expect': 'off',
     },

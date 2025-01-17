@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { DomainService } from '@ebizbase/angular-common-service';
 import {
   OtpVerifyFormComponent,
   OtpVerifyFormSubmitEvent,
 } from '../core/components/forms/otp-verify.component';
-import { ActivatedRoute } from '@angular/router';
 import { IamService } from '../core/services/iam.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { DomainService } from '../core/services/host.service';
 
 @Component({
   selector: 'app-identify-verify-otp-page',
@@ -19,16 +19,22 @@ import { DomainService } from '../core/services/host.service';
         <h1 class="text-xl md:text-4xl font-semibold leading-tight w-full mb-4">
           OTP Verification
         </h1>
-        <h2 class="md:text-lg leading-tight w-full">Enter the OTP you received at {{ email }}</h2>
+        <h2 class="md:text-lg leading-tight w-full">Enter the one time password</h2>
       </div>
       <div class="w-full py-4">
-        <app-otp-verify-form [isLoading]="isLoading" (formSubmit)="formSubmitted($event)" />
+        <app-otp-verify-form
+          [email]="email"
+          [isLoading]="isLoading"
+          (formSubmit)="formSubmitted($event)"
+        />
       </div>
     </div>
   `,
 })
 export class VerifyOTPPageComponent {
   email: string;
+  firstName: string;
+  lastName?: string;
   isLoading = false;
 
   constructor(
@@ -37,15 +43,25 @@ export class VerifyOTPPageComponent {
     private iam: IamService
   ) {
     this.email = this.route.snapshot.queryParams['email'];
+    this.firstName = this.route.snapshot.queryParams['firstName'];
+    this.lastName = this.route.snapshot.queryParams['lastName'];
   }
 
   async formSubmitted({ otp }: OtpVerifyFormSubmitEvent) {
-    this.iam.verifyOtp(this.email, otp).subscribe({
+    this.iam.verifyOtp({ email: this.email, otp }).subscribe({
       next: () => {
+        let redirectUrl: string;
         const continueParam = this.route.snapshot.queryParams['continue'];
-        window.location.href =
-          continueParam ?? `${this.domain.Protocol}//${this.domain.RootDomain}`;
-        this.isLoading = false;
+        if (continueParam) {
+          if (this.firstName !== undefined && this.firstName !== '') {
+            redirectUrl = `${this.domain.Protocol}//${this.domain.MyAccountSiteDomain}?continue=${continueParam}`;
+          } else {
+            redirectUrl = continueParam;
+          }
+        } else {
+          redirectUrl = `${this.domain.Protocol}//${this.domain.MyAccountSiteDomain}`;
+        }
+        window.location.href = redirectUrl;
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);

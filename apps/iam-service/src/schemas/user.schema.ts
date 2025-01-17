@@ -1,7 +1,6 @@
 import { InjectModel, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { TOTP } from './totp';
-import { HOTP } from './hotp';
+import speakeasy from 'speakeasy';
 
 @Schema({ versionKey: false, timestamps: true })
 export class User {
@@ -14,11 +13,17 @@ export class User {
   @Prop()
   lastName?: string;
 
-  @Prop({ type: HOTP, default: () => new HOTP() })
-  hotp: HOTP;
+  @Prop({ default: () => speakeasy.generateSecret().base32 })
+  otpSecret: string;
 
-  @Prop({ type: TOTP })
-  totp?: TOTP;
+  @Prop({ default: 0 })
+  otpCounter: number;
+
+  @Prop({ default: false })
+  otpUsed: boolean;
+
+  @Prop({ default: () => new Date() })
+  otpIssuedAt: Date;
 }
 
 export const InjectUserModel = () => InjectModel(User.name);

@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import {
-  FormsModule,
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { LoaderButtonComponent } from '@ebizbase/angular-common-ui';
 import { Dict } from '@ebizbase/common-types';
 import { TuiTextfield } from '@taiga-ui/core';
-import { LoaderButtonComponent } from '@ebizbase/angular-common-ui';
 
 export interface IdentifyFormSubmmittedEvent {
   email: string;
@@ -30,7 +30,6 @@ export interface IdentifyFormSubmmittedEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="flex flex-col gap-2" [formGroup]="form">
-      <!-- Email field -->
       <tui-textfield iconStart="@tui.mail">
         <label tuiLabel for="email">Email</label>
         <input
@@ -38,7 +37,7 @@ export interface IdentifyFormSubmmittedEvent {
           type="email"
           formControlName="email"
           autocomplete="email"
-          [invalid]="email.touched && email.invalid"
+          [invalid]="isControlInvalid('email')"
         />
       </tui-textfield>
 
@@ -74,8 +73,9 @@ export class IdentifyFormComponent {
     }),
   });
 
-  get email() {
-    return this.form.get('email');
+  isControlInvalid(controlName: string) {
+    const control = this.form.get(controlName);
+    return control.touched && !control.valid;
   }
 
   onSubmitEvent() {
