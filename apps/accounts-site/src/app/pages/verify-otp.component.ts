@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DomainService } from '@ebizbase/angular-common-service';
 import {
@@ -8,6 +8,7 @@ import {
   OtpVerifyFormSubmitEvent,
 } from '../core/components/forms/otp-verify.component';
 import { IamService } from '../core/services/iam.service';
+import { WA_LOCATION } from '@ng-web-apis/common';
 
 @Component({
   selector: 'app-identify-verify-otp-page',
@@ -38,6 +39,7 @@ export class VerifyOTPPageComponent {
   isLoading = false;
 
   constructor(
+    @Inject(WA_LOCATION) private location: Location,
     private route: ActivatedRoute,
     private domain: DomainService,
     private iam: IamService
@@ -61,7 +63,7 @@ export class VerifyOTPPageComponent {
         } else {
           redirectUrl = `${this.domain.Protocol}//${this.domain.MyAccountSiteDomain}`;
         }
-        window.location.href = redirectUrl;
+        this.location.href = redirectUrl;
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);

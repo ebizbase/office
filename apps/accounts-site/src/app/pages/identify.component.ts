@@ -32,7 +32,7 @@ export class IdentifyPageComponent {
   constructor(
     private router: Router,
     private iam: IamService
-  ) {}
+  ) { }
 
   async formSubmitted({ email }: IdentifyFormSubmmittedEvent) {
     this.isLoading = true;
